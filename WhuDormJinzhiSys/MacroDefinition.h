@@ -46,7 +46,7 @@
 #define showStatusLogIdentifier     @"showStatusLog"// show状态日志
 #define showLogDetailIdentifier     @"showLogDetail"// show状态日志的详细页面
 #define showHisDataIdentifier       @"showHisData"  // show历史数据
-#define showDormInfoIdentifier      @"showDormInfo" // show历史数据
+#define showDormInfoIdentifier      @"showDormInfo" // show学生宿舍页面
 
 
 

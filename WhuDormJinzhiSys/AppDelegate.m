@@ -34,27 +34,14 @@
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]]; // 导航栏各种按钮颜色
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent]; // 导航栏亮色 需要配合plist viewcontroller 某项属性设置为NO
     
-    
-    
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    UINavigationController *navController = (UINavigationController *)self.window.rootViewController;
-//    [navController.navigationBar setTranslucent:NO]; // 设置为非透明
-//    if (accountManager.isLogin) { // 已经登录 则跳过登陆页面
-//        [navController pushViewController:[storyboard instantiateViewControllerWithIdentifier:dormInfoIdentity] animated:NO];
-//    }
-//    [((UINavigationController *)self.window.rootViewController).navigationBar setTranslucent:NO]; // 设置为非透明
-    
-    // 默认rootviewcontroller 为登陆界面
-    UINavigationController *dormInfoNav = [storyboard instantiateViewControllerWithIdentifier:dormInfoNavIdentity];
-//    dormInfoNav.navigationBar.translucent = NO;  // 设置为非透明
-
-    if (accountManager.isLogin) { // 已经登录 则跳过登陆页面 根据role决定rootviewcontroller是哪一个
+    UINavigationController *navController = (UINavigationController *)self.window.rootViewController;
+    navController.navigationBar.translucent = NO; // 设置为非透明
+    if (accountManager.isLogin) { // 已经登录 则跳过登陆页面 根据role决定 push 到学生还是管理员页面
         if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 学生
-            self.window.rootViewController = dormInfoNav;
-
+            [navController pushViewController:[storyboard instantiateViewControllerWithIdentifier:dormInfoIdentity] animated:NO];
         }
     }
-
 
     [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:80]; // 距离，是否能调到中间位置
     sleep(1);  //

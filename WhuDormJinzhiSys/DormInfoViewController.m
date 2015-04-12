@@ -37,9 +37,11 @@
     accountManager = [AccountManager sharedAccountManager];
     if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {//学生
         NSLog(@"here set settingbarbutton");
+        [self.navigationItem setHidesBackButton:YES];
+
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"setting"] style:UIBarButtonItemStylePlain target:self action:@selector(didClickSettingButton:)];
     } else {
-        [self.navigationItem setHidesBackButton:YES];
+        [self.navigationItem setHidesBackButton:NO];
     }
 
     // 导航条添加 segment control
@@ -87,6 +89,7 @@
 // 进入设置页面
 - (void)didClickSettingButton:(UIBarButtonItem *)sender {
     NSLog(@"didclick sender:%@",sender);
+    [self.navigationController popToRootViewControllerAnimated:YES];
     //    [self performSegueWithIdentifier:showSettingIdentifier sender:self];
 }
 - (void)didReceiveMemoryWarning {

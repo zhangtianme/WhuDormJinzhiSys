@@ -117,7 +117,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-//    [self.navigationController setNavigationBarHidden:YES]; // 隐藏导航栏
+    [self.navigationController setNavigationBarHidden:YES]; // 隐藏导航栏
     if (!mbHud) {  // 初始化指示器
         mbHud = [[MBProgressHUD alloc] initWithView:self.view];
         

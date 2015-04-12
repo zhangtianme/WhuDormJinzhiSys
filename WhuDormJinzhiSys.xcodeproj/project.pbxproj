@@ -18,7 +18,8 @@
 		3644B4FA1ABB02A4003077EF /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3644B4F81ABB02A4003077EF /* LaunchScreen.xib */; };
 		3644B5061ABB02A5003077EF /* WhuDormJinzhiSysTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644B5051ABB02A5003077EF /* WhuDormJinzhiSysTests.m */; };
 		3644B5B31ABB0EF1003077EF /* DormInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3644B5B21ABB0EF1003077EF /* DormInfoViewController.m */; };
-		364FCD791ADA057A00C4A7AA /* setting.png in Resources */ = {isa = PBXBuildFile; fileRef = 364FCD781ADA057A00C4A7AA /* setting.png */; };
+		364FCD7B1ADA0F2200C4A7AA /* setting.png in Resources */ = {isa = PBXBuildFile; fileRef = 364FCD7A1ADA0F2200C4A7AA /* setting.png */; };
+		364FCD7D1ADA0F9300C4A7AA /* setting@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 364FCD7C1ADA0F9300C4A7AA /* setting@2x.png */; };
 		365A41291ABC528500BB077F /* DormTypeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 365A41281ABC528500BB077F /* DormTypeViewController.m */; };
 		3672F73B1AC04A4800114E75 /* StudentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3672F73A1AC04A4800114E75 /* StudentViewController.m */; };
 		3677E12E1AC1604900B3D1E2 /* TallyBookViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3677E12D1AC1604900B3D1E2 /* TallyBookViewController.m */; };
@@ -115,7 +116,8 @@
 		3644B5051ABB02A5003077EF /* WhuDormJinzhiSysTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WhuDormJinzhiSysTests.m; sourceTree = "<group>"; };
 		3644B5B11ABB0EF1003077EF /* DormInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DormInfoViewController.h; sourceTree = "<group>"; };
 		3644B5B21ABB0EF1003077EF /* DormInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DormInfoViewController.m; sourceTree = "<group>"; };
-		364FCD781ADA057A00C4A7AA /* setting.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = setting.png; sourceTree = "<group>"; };
+		364FCD7A1ADA0F2200C4A7AA /* setting.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = setting.png; sourceTree = "<group>"; };
+		364FCD7C1ADA0F9300C4A7AA /* setting@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "setting@2x.png"; sourceTree = "<group>"; };
 		365A41271ABC528500BB077F /* DormTypeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DormTypeViewController.h; sourceTree = "<group>"; };
 		365A41281ABC528500BB077F /* DormTypeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DormTypeViewController.m; sourceTree = "<group>"; };
 		365A412A1ABC53E400BB077F /* MacroDefinition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacroDefinition.h; sourceTree = "<group>"; };
@@ -338,7 +340,6 @@
 				36CC4E111AD37D2200601221 /* whuLogoWhite.png */,
 				36CC4E151AD37F8C00601221 /* whuLogoWhiteRe.png */,
 				360F49AE1AD3BFE200C1421B /* suntransWhiteLogo.png */,
-				364FCD781ADA057A00C4A7AA /* setting.png */,
 				360F49B01AD3C00F00C1421B /* logInBackground.png */,
 				369767931ACD3383009B5223 /* balanceIcon.png */,
 				369767941ACD3383009B5223 /* currentIcon.png */,
@@ -346,6 +347,7 @@
 				369767961ACD3383009B5223 /* elecIcon.png */,
 				369767971ACD3383009B5223 /* facultyIcon.png */,
 				369767981ACD3383009B5223 /* infoIcon.png */,
+				364FCD7C1ADA0F9300C4A7AA /* setting@2x.png */,
 				369767991ACD3383009B5223 /* manPhotoIcon.png */,
 				3697679A1ACD3383009B5223 /* offStateIcon.png */,
 				3697679B1ACD3383009B5223 /* onStateIcon.png */,
@@ -357,6 +359,7 @@
 				369767A11ACD3383009B5223 /* searchIcon.png */,
 				369767A21ACD3383009B5223 /* settingIcon.png */,
 				369767A31ACD3383009B5223 /* subsidyIcon.png */,
+				364FCD7A1ADA0F2200C4A7AA /* setting.png */,
 				369767A41ACD3383009B5223 /* userIDIcon.png */,
 				369767A51ACD3383009B5223 /* voltageIcon.png */,
 				369767A61ACD3383009B5223 /* warningIcon.png */,
@@ -645,7 +648,7 @@
 				369767AD1ACD3383009B5223 /* manPhotoIcon.png in Resources */,
 				369767B21ACD3383009B5223 /* powerRateIcon.png in Resources */,
 				369767AC1ACD3383009B5223 /* infoIcon.png in Resources */,
-				364FCD791ADA057A00C4A7AA /* setting.png in Resources */,
+				364FCD7B1ADA0F2200C4A7AA /* setting.png in Resources */,
 				36CC4E0F1AD36E6F00601221 /* bottomLine.png in Resources */,
 				36A332771AD3D3B3009C130F /* IQKeyboardManager.bundle in Resources */,
 				369767B11ACD3383009B5223 /* powerIcon.png in Resources */,
@@ -669,6 +672,7 @@
 				369767B41ACD3383009B5223 /* roomIcon.png in Resources */,
 				369767A81ACD3383009B5223 /* currentIcon.png in Resources */,
 				369767B91ACD3383009B5223 /* voltageIcon.png in Resources */,
+				364FCD7D1ADA0F9300C4A7AA /* setting@2x.png in Resources */,
 				369767B51ACD3383009B5223 /* searchIcon.png in Resources */,
 				36CC4E101AD36E6F00601221 /* headLine.png in Resources */,
 				369767B81ACD3383009B5223 /* userIDIcon.png in Resources */,
