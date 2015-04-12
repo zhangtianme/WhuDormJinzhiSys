@@ -22,7 +22,7 @@
 + (NSArray *)getAllSwitchDataWithSIDs:(NSArray *)SIDs;
 
 // 登录 返回角色号 0 1-9
-//+ (NSString *)logInWithID:(NSString *)userID password:(NSString *)password;
++ (NSString *)logInWithID:(NSString *)userID password:(NSString *)password;
 // 检查学生是否具有控制开关的权限 0/1
 + (NSString *)checkStu:(NSString *)stuID;
 // 查询用户信息

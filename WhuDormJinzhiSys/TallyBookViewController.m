@@ -324,7 +324,7 @@ static NSString * const reuseIdentifier = @"billCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"how high in indexpath:%@",indexPath);
+//    NSLog(@"how high in indexpath:%@",indexPath);
     //    UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
     //    NSLog(@"height:%d",cell.contentView.frame.size.height);
     //    return cell.contentView.frame.size.height;
@@ -431,14 +431,16 @@ static NSString * const reuseIdentifier = @"billCell";
             if ([allKeys containsObject:getTimeName]) billCell.dateLabel.text = [NSString stringWithFormat:@"%@", [[aRecharge valueForKey:getTimeName] substringToIndex:16]];
             billCell.detailLabel.text = [NSString stringWithFormat:@"%@ 充值",stuName];
             billCell.priceLabel.text = [NSString stringWithFormat:@"+%.2f",recharge.floatValue];
-            
         }break;
             
         case 1: {// 支出明细
             NSDictionary *aChargeback = [monChargeback objectAtIndex:indexPath.row];
             NSArray *allKeys = [aChargeback allKeys];
-            billCell.detailLabel.text = @"宿舍用电";
-            if ([allKeys containsObject:chargebackName]) billCell.priceLabel.text = [NSString stringWithFormat:@"-%.2f", ((NSString *)[aChargeback valueForKey:chargebackName]).floatValue];
+            NSString *elec;
+            if ([allKeys containsObject:electricityName]) elec = [aChargeback valueForKey:electricityName];
+
+            billCell.detailLabel.text = [NSString stringWithFormat:@"宿舍用电%.2f度",elec.floatValue];
+            if ([allKeys containsObject:chargebackName]) billCell.priceLabel.text = [NSString stringWithFormat:@"-%.2f元", ((NSString *)[aChargeback valueForKey:chargebackName]).floatValue];
             if ([allKeys containsObject:getTimeName]) {
                 billCell.dateLabel.text = [NSString stringWithFormat:@"%@", [[aChargeback valueForKey:getTimeName] substringToIndex:10]];
             }
@@ -534,11 +536,11 @@ static NSString * const reuseIdentifier = @"billCell";
 
     // 宿舍支出记录
 //    monChargeback = [WhuControlWebservice queryChargeBack:manager.roomID accountType:accountType startTime:startTime endTime:endTime freq:@"24"];
+    NSLog(@"roomid:%@ accouttype:%@ ",manager.roomID,accountType);
     NSArray *nonSortArray = [WhuControlWebservice queryChargeBack:manager.roomID accountType:accountType startTime:startTime endTime:endTime freq:@"24"];
     monChargeback = [nonSortArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         return [[obj2 valueForKey:getTimeName] compare:[obj1 valueForKey:getTimeName]];
     }];
-
     NSLog(@"chargeback is :%@",monChargeback);
     // 查询学生宿舍充值记录
     NSArray *nonSortArray2 = [WhuControlWebservice queryRecharge:manager.roomID accountType:accountType startTime:startTime endTime:endTime];

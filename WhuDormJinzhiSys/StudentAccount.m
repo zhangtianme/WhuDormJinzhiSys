@@ -14,7 +14,6 @@
 
 @implementation StudentAccount
 
-@synthesize stuID,roomID;
 
 /**
  * 单例模式，初始化，仅存在一个实例对象不过注意在调用的地方只能使用该方法初始化，不然会清空前面的数据
@@ -33,8 +32,9 @@
     NSLog(@"init Account Manager");
     // 给账户分配空间
     if (self = [super init]) {
-        stuID = [[NSString alloc] init];
-        roomID = [[NSString alloc] init];
+        _userID = [[NSString alloc] init];
+        _stuID   = [[NSString alloc] init];
+        _roomID  = [[NSString alloc] init];
     }
 
     return self;

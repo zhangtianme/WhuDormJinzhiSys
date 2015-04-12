@@ -33,6 +33,8 @@
 #define dormLightingIdentity        @"dormLighting"
 
 #define loginIndentity              @"loginView"
+
+#define dormInfoNavIdentity         @"dormInfoNav"  // dorm info navigationcontroller
 #define dormInfoIdentity            @"dormInfoView"
 
 #define airConName                  @"空调"

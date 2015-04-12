@@ -15,7 +15,9 @@
     DormTypeViewController *dormAirCon;     // 空调子视图
     DormTypeViewController *dormLighting;   // 照明子视图
     MBProgressHUD *mbHud;
-    StudentAccount *manager; // 账户管理
+    StudentAccount *studentAccount; // 账户管理
+    AccountManager *accountManager;
+
 }
 
 @property (nonatomic, strong) UIScrollView *scrollView;
@@ -29,14 +31,23 @@
     [super viewDidLoad];
     NSLog(@"doeminfo view did load");
     // Do any additional setup after loading the view.
+    self.navigationController.navigationBar.translucent = NO; // 不透明
+    
+    studentAccount = [StudentAccount sharedStudentAccount];
+    accountManager = [AccountManager sharedAccountManager];
+    if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {//学生
+        NSLog(@"here set settingbarbutton");
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"setting"] style:UIBarButtonItemStylePlain target:self action:@selector(didClickSettingButton:)];
+    } else {
+        [self.navigationItem setHidesBackButton:YES];
+    }
 
     // 导航条添加 segment control
     self.segmentedControl = [[UISegmentedControl alloc] initWithItems:@[airConName, lightingName]];
     [self.segmentedControl setFrame:CGRectMake(96, 7, 128, 30)];  //
     [self.segmentedControl setSelectedSegmentIndex:0]; // 选择第一项
     [self.navigationItem setTitleView:self.segmentedControl];
-    [self.navigationItem setHidesBackButton:YES];
-    
+
     //
     CGFloat viewWidth = self.view.frame.size.width;
     CGFloat viewHeight = self.view.frame.size.height - 20 - 44;
@@ -71,9 +82,12 @@
     [dormLighting didMoveToParentViewController:self];
     
 
-    manager = [StudentAccount sharedStudentAccount];
 
-    
+}
+// 进入设置页面
+- (void)didClickSettingButton:(UIBarButtonItem *)sender {
+    NSLog(@"didclick sender:%@",sender);
+    //    [self performSegueWithIdentifier:showSettingIdentifier sender:self];
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -95,13 +109,12 @@
         mbHud.dimBackground = YES;
     }
     [mbHud showWithTitle:@"Loading..." detail:nil];
+    [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
+
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     NSLog(@"info view did appear");
-
-    [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
-
     // 加了block 才能在block里面有写的权限
     __block NSString *controlLimit = [[NSString alloc] init]; //
     __block NSDictionary *userInfo = [[NSDictionary alloc] init]; //
@@ -113,20 +126,20 @@
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
     dispatch_async(queue, ^{
         // 检查学生是否具有控制开关的权限 0/1
-        controlLimit = [WhuControlWebservice checkStu:manager.stuID];
+        controlLimit = [WhuControlWebservice checkStu:studentAccount.stuID];
         [self getDataFromControlLimit:controlLimit];
         NSLog(@"limit %@",controlLimit);
         // 查询学生信息
-        userInfo = [WhuControlWebservice queryUserInfo:manager.stuID];
+        userInfo = [WhuControlWebservice queryUserInfo:studentAccount.stuID];
         [self getDataFromUserInfo:userInfo];
         // 查询空调用电状态
-        airConChannelState = [WhuControlWebservice queryChannelStat:manager.roomID accountType:airConName];
+        airConChannelState = [WhuControlWebservice queryChannelStat:studentAccount.roomID accountType:airConName];
         [self getDataFromChannelState:airConChannelState accountType:airConName];
         // 查询照明用电状态
-        lightChannelState = [WhuControlWebservice queryChannelStat:manager.roomID accountType:lightingName];
+        lightChannelState = [WhuControlWebservice queryChannelStat:studentAccount.roomID accountType:lightingName];
         [self getDataFromChannelState:lightChannelState accountType:lightingName];
         // 查询某间宿舍学生信息
-        students = [WhuControlWebservice queryRoom:manager.roomID];
+        students = [WhuControlWebservice queryRoom:studentAccount.roomID];
         [self getDataFromStudents:students];
         // 返回主线程 处理结果
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -142,61 +155,61 @@
 
 }
 - (void)getDataFromControlLimit:(NSString *)controlLimit {
-    manager.controlLimit = controlLimit;
+    studentAccount.controlLimit = controlLimit;
 }
 
 - (void)getDataFromUserInfo:(NSDictionary *)userInfo {
     NSArray *allKeys = [userInfo allKeys];
-    if ([allKeys containsObject:roomIDName]) manager.roomID = [userInfo valueForKey:roomIDName];
-    if ([allKeys containsObject:facultyName]) manager.faculty = [userInfo valueForKey:facultyName];
-    if ([allKeys containsObject:professionalName]) manager.professional = [userInfo valueForKey:professionalName];
-    if ([allKeys containsObject:roleName]) manager.role = [userInfo valueForKey:roleName];
-    if ([allKeys containsObject:stuNameName]) manager.stuName = [userInfo valueForKey:stuNameName];
+    if ([allKeys containsObject:roomIDName]) studentAccount.roomID = [userInfo valueForKey:roomIDName];
+    if ([allKeys containsObject:facultyName]) studentAccount.faculty = [userInfo valueForKey:facultyName];
+    if ([allKeys containsObject:professionalName]) studentAccount.professional = [userInfo valueForKey:professionalName];
+    if ([allKeys containsObject:roleName]) studentAccount.role = [userInfo valueForKey:roleName];
+    if ([allKeys containsObject:stuNameName]) studentAccount.stuName = [userInfo valueForKey:stuNameName];
     
-    if ([allKeys containsObject:areaName]) manager.area = [userInfo valueForKey:areaName];
-    if ([allKeys containsObject:buildingName]) manager.building = [userInfo valueForKey:buildingName];
-    if ([allKeys containsObject:unitName]) manager.unit = [userInfo valueForKey:unitName];
-    if ([allKeys containsObject:roomNumName]) manager.roomNum = [userInfo valueForKey:roomNumName];
+    if ([allKeys containsObject:areaName]) studentAccount.area = [userInfo valueForKey:areaName];
+    if ([allKeys containsObject:buildingName]) studentAccount.building = [userInfo valueForKey:buildingName];
+    if ([allKeys containsObject:unitName]) studentAccount.unit = [userInfo valueForKey:unitName];
+    if ([allKeys containsObject:roomNumName]) studentAccount.roomNum = [userInfo valueForKey:roomNumName];
     
-    if ([allKeys containsObject:subsidyDegreeAirConName]) manager.subsidyDegreeAirCon = [userInfo valueForKey:subsidyDegreeAirConName];
-    if ([allKeys containsObject:chargebackDegreeAirConName]) manager.chargebackDegreeAirCon = [userInfo valueForKey:chargebackDegreeAirConName];
-    if ([allKeys containsObject:chargebackAirConName]) manager.chargebackAirCon = [userInfo valueForKey:chargebackAirConName];
-    if ([allKeys containsObject:subsidyAirConName]) manager.subsidyAirCon = [userInfo valueForKey:subsidyAirConName];
-    if ([allKeys containsObject:priceAirConName]) manager.priceAirCon = [userInfo valueForKey:priceAirConName];
-    if ([allKeys containsObject:subsidyDegreeLightName]) manager.subsidyDegreeLight = [userInfo valueForKey:subsidyDegreeLightName];
-    if ([allKeys containsObject:chargebackDegreeLightName]) manager.chargebackDegreeLight = [userInfo valueForKey:chargebackDegreeLightName];
-    if ([allKeys containsObject:chargebackLightName]) manager.chargebackLight = [userInfo valueForKey:chargebackLightName];
-    if ([allKeys containsObject:subsidyLightName]) manager.subsidyLight = [userInfo valueForKey:subsidyLightName];
-    if ([allKeys containsObject:priceLightName]) manager.priceLight = [userInfo valueForKey:priceLightName];
+    if ([allKeys containsObject:subsidyDegreeAirConName]) studentAccount.subsidyDegreeAirCon = [userInfo valueForKey:subsidyDegreeAirConName];
+    if ([allKeys containsObject:chargebackDegreeAirConName]) studentAccount.chargebackDegreeAirCon = [userInfo valueForKey:chargebackDegreeAirConName];
+    if ([allKeys containsObject:chargebackAirConName]) studentAccount.chargebackAirCon = [userInfo valueForKey:chargebackAirConName];
+    if ([allKeys containsObject:subsidyAirConName]) studentAccount.subsidyAirCon = [userInfo valueForKey:subsidyAirConName];
+    if ([allKeys containsObject:priceAirConName]) studentAccount.priceAirCon = [userInfo valueForKey:priceAirConName];
+    if ([allKeys containsObject:subsidyDegreeLightName]) studentAccount.subsidyDegreeLight = [userInfo valueForKey:subsidyDegreeLightName];
+    if ([allKeys containsObject:chargebackDegreeLightName]) studentAccount.chargebackDegreeLight = [userInfo valueForKey:chargebackDegreeLightName];
+    if ([allKeys containsObject:chargebackLightName]) studentAccount.chargebackLight = [userInfo valueForKey:chargebackLightName];
+    if ([allKeys containsObject:subsidyLightName]) studentAccount.subsidyLight = [userInfo valueForKey:subsidyLightName];
+    if ([allKeys containsObject:priceLightName]) studentAccount.priceLight = [userInfo valueForKey:priceLightName];
 }
 - (void)getDataFromChannelState:(NSDictionary *)channelState accountType:(NSString *)accountType {
     NSArray *allKeys = [channelState allKeys];
     if ([accountType isEqualToString:airConName]) { // 空调
-        if ([allKeys containsObject:electricityName]) manager.electricityAirCon = [channelState valueForKey:electricityName];
-        if ([allKeys containsObject:voltageName]) manager.voltageAirCon = [channelState valueForKey:voltageName];
-        if ([allKeys containsObject:currentName]) manager.currentAirCon = [channelState valueForKey:currentName];
-        if ([allKeys containsObject:powerName]) manager.powerAirCon = [channelState valueForKey:powerName];
-        if ([allKeys containsObject:powerRateName]) manager.powerRateAirCon = [channelState valueForKey:powerRateName];
-        if ([allKeys containsObject:elecDayName]) manager.elecDayAirCon = [channelState valueForKey:elecDayName];
-        if ([allKeys containsObject:elecMonName]) manager.elecMonAirCon = [channelState valueForKey:elecMonName];
-        if ([allKeys containsObject:stateName]) manager.stateAirCon = [channelState valueForKey:stateName];
-        if ([allKeys containsObject:statusName]) manager.statusAirCon = [self status:[channelState valueForKey:statusName]];
-        if ([allKeys containsObject:accountStatusName]) manager.accountStatusAirCon = [self accountStatus:[channelState valueForKey:accountStatusName]];
+        if ([allKeys containsObject:electricityName]) studentAccount.electricityAirCon = [channelState valueForKey:electricityName];
+        if ([allKeys containsObject:voltageName]) studentAccount.voltageAirCon = [channelState valueForKey:voltageName];
+        if ([allKeys containsObject:currentName]) studentAccount.currentAirCon = [channelState valueForKey:currentName];
+        if ([allKeys containsObject:powerName]) studentAccount.powerAirCon = [channelState valueForKey:powerName];
+        if ([allKeys containsObject:powerRateName]) studentAccount.powerRateAirCon = [channelState valueForKey:powerRateName];
+        if ([allKeys containsObject:elecDayName]) studentAccount.elecDayAirCon = [channelState valueForKey:elecDayName];
+        if ([allKeys containsObject:elecMonName]) studentAccount.elecMonAirCon = [channelState valueForKey:elecMonName];
+        if ([allKeys containsObject:stateName]) studentAccount.stateAirCon = [channelState valueForKey:stateName];
+        if ([allKeys containsObject:statusName]) studentAccount.statusAirCon = [self status:[channelState valueForKey:statusName]];
+        if ([allKeys containsObject:accountStatusName]) studentAccount.accountStatusAirCon = [self accountStatus:[channelState valueForKey:accountStatusName]];
     } else if ([accountType isEqualToString:lightingName]) { // 照明
-        if ([allKeys containsObject:electricityName]) manager.electricityLight = [channelState valueForKey:electricityName];
-        if ([allKeys containsObject:voltageName]) manager.voltageLight = [channelState valueForKey:voltageName];
-        if ([allKeys containsObject:currentName]) manager.currentLight = [channelState valueForKey:currentName];
-        if ([allKeys containsObject:powerName]) manager.powerLight = [channelState valueForKey:powerName];
-        if ([allKeys containsObject:powerRateName]) manager.powerRateLight = [channelState valueForKey:powerRateName];
-        if ([allKeys containsObject:elecDayName]) manager.elecDayLight = [channelState valueForKey:elecDayName];
-        if ([allKeys containsObject:elecMonName]) manager.elecMonLight = [channelState valueForKey:elecMonName];
-        if ([allKeys containsObject:stateName]) manager.stateLight = [channelState valueForKey:stateName];
-        if ([allKeys containsObject:statusName]) manager.statusLight = [self status:[channelState valueForKey:statusName]];
-        if ([allKeys containsObject:accountStatusName]) manager.accountStatusLight = [self accountStatus:[channelState valueForKey:accountStatusName]];
+        if ([allKeys containsObject:electricityName]) studentAccount.electricityLight = [channelState valueForKey:electricityName];
+        if ([allKeys containsObject:voltageName]) studentAccount.voltageLight = [channelState valueForKey:voltageName];
+        if ([allKeys containsObject:currentName]) studentAccount.currentLight = [channelState valueForKey:currentName];
+        if ([allKeys containsObject:powerName]) studentAccount.powerLight = [channelState valueForKey:powerName];
+        if ([allKeys containsObject:powerRateName]) studentAccount.powerRateLight = [channelState valueForKey:powerRateName];
+        if ([allKeys containsObject:elecDayName]) studentAccount.elecDayLight = [channelState valueForKey:elecDayName];
+        if ([allKeys containsObject:elecMonName]) studentAccount.elecMonLight = [channelState valueForKey:elecMonName];
+        if ([allKeys containsObject:stateName]) studentAccount.stateLight = [channelState valueForKey:stateName];
+        if ([allKeys containsObject:statusName]) studentAccount.statusLight = [self status:[channelState valueForKey:statusName]];
+        if ([allKeys containsObject:accountStatusName]) studentAccount.accountStatusLight = [self accountStatus:[channelState valueForKey:accountStatusName]];
     }
 }
 - (void)getDataFromStudents:(NSArray *)students {
-    manager.students = students;
+    studentAccount.students = students;
 }
 
 - (NSString *)status:(NSString *)getStatus {

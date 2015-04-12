@@ -40,9 +40,9 @@
  *  @param userID   用户ID
  *  @param password 用户密码
  *
- *  @return 用户的角色号 0 为登陆失败 1 2 4 5 6 9 12 13为角色号
+ *  @return bool 是否登陆成功
  */
-- (NSString *)logInWithUserID:(NSString *)userID password:(NSString *)password;
+- (BOOL)logInWithUserID:(NSString *)userID password:(NSString *)password;
 /**
  *  修改密码
  *

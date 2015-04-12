@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="7Vi-ye-dcE">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7531" systemVersion="14D131" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="42Q-0g-Dea">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7520"/>
     </dependencies>
     <scenes>
         <!--Log In View Controller-->
@@ -21,29 +21,29 @@
                     <navigationItem key="navigationItem" id="8Dn-ZT-Xrg"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
-                        <segue destination="517-mh-OXn" kind="show" identifier="showDormInfo" id="amu-QU-f6d"/>
+                        <segue destination="7Vi-ye-dcE" kind="showDetail" identifier="showDormInfo" id="L4m-SL-36k"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9dc-kv-AdL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="268" y="408"/>
+            <point key="canvasLocation" x="376" y="-250"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="x5Y-md-bsv">
             <objects>
-                <navigationController id="7Vi-ye-dcE" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="dormInfoNav" id="7Vi-ye-dcE" sceneMemberID="viewController">
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="aRw-Jb-v40">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="42Q-0g-Dea" kind="relationship" relationship="rootViewController" id="djE-42-xLU"/>
+                        <segue destination="517-mh-OXn" kind="relationship" relationship="rootViewController" id="fQ3-bz-S8z"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ib2-Um-ZGu" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-132" y="408"/>
+            <point key="canvasLocation" x="376" y="424"/>
         </scene>
         <!--Dorm Info View Controller-->
         <scene sceneID="btF-C5-Q2E">
@@ -62,7 +62,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9cM-QS-1if" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="708" y="408"/>
+            <point key="canvasLocation" x="804" y="408"/>
         </scene>
         <!--Dorm Type View Controller-->
         <scene sceneID="sr9-b2-On7">
@@ -1306,9 +1306,9 @@
         <image name="voltageIcon.png" width="126" height="126"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="yhx-H7-g7E"/>
         <segue reference="7Kz-Zh-hK0"/>
         <segue reference="XLS-T8-HFV"/>
         <segue reference="fUr-Yz-CZY"/>
+        <segue reference="yhx-H7-g7E"/>
     </inferredMetricsTieBreakers>
 </document>

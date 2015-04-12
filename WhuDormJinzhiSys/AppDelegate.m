@@ -10,7 +10,7 @@
 #import "MacroDefinition.h"
 
 @interface AppDelegate (){
-    StudentAccount *manager;
+    StudentAccount *studentAccount;
     AccountManager *accountManager;
 }
 
@@ -21,23 +21,40 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    manager = [StudentAccount sharedStudentAccount];
+    // 每次启动之前把 属性读出来 如果需要登陆 则在登陆 函数里面再次读取
+    studentAccount = [StudentAccount sharedStudentAccount];
     accountManager = [AccountManager sharedAccountManager];
-    manager.stuID = @"2012302530100";
+    
+    studentAccount.stuID = accountManager.userID;
+    studentAccount.userID = accountManager.userID;
+    studentAccount.role = accountManager.role;
     
     [[UINavigationBar appearance] setBarTintColor:UIColorFromRGB(0x50A0D2)]; // 不适用半透明的话是原色
     [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, nil]]; // 导航栏标题颜色
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]]; // 导航栏各种按钮颜色
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent]; // 导航栏亮色 需要配合plist viewcontroller 某项属性设置为NO
     
+    
+    
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-//    BOOL fakeLogin = NO;
-    UINavigationController *navController = (UINavigationController *)self.window.rootViewController;
-    [navController.navigationBar setTranslucent:NO]; // 设置为非透明
-    if (accountManager.isLogin) { // 已经登录 则跳过登陆页面
-        [navController pushViewController:[storyboard instantiateViewControllerWithIdentifier:dormInfoIdentity] animated:NO];
-    }
+//    UINavigationController *navController = (UINavigationController *)self.window.rootViewController;
+//    [navController.navigationBar setTranslucent:NO]; // 设置为非透明
+//    if (accountManager.isLogin) { // 已经登录 则跳过登陆页面
+//        [navController pushViewController:[storyboard instantiateViewControllerWithIdentifier:dormInfoIdentity] animated:NO];
+//    }
 //    [((UINavigationController *)self.window.rootViewController).navigationBar setTranslucent:NO]; // 设置为非透明
+    
+    // 默认rootviewcontroller 为登陆界面
+    UINavigationController *dormInfoNav = [storyboard instantiateViewControllerWithIdentifier:dormInfoNavIdentity];
+//    dormInfoNav.navigationBar.translucent = NO;  // 设置为非透明
+
+    if (accountManager.isLogin) { // 已经登录 则跳过登陆页面 根据role决定rootviewcontroller是哪一个
+        if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 学生
+            self.window.rootViewController = dormInfoNav;
+
+        }
+    }
+
 
     [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:80]; // 距离，是否能调到中间位置
     sleep(1);  //
