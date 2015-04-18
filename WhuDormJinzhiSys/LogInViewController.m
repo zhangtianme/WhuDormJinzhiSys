@@ -115,9 +115,13 @@
 //    self.navigationItem.backBarButtonItem = nilBackItem;
 }
 
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES]; // 隐藏导航栏
+    // 清空账号密码栏
+    accountTextField.text = nil;
+    passwordTextField.text = nil;
     if (!mbHud) {  // 初始化指示器
         mbHud = [[MBProgressHUD alloc] initWithView:self.view];
         
@@ -129,6 +133,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     NSLog(@"viewwill disappear");
+    [self dismissKeyboard];
     [self.navigationController setNavigationBarHidden:NO]; //显示导航栏
 }
 - (void)didReceiveMemoryWarning {
@@ -141,13 +146,18 @@
     // 没有收到数据 显示错误指示2秒钟
     [mbHud showWithTitle:@"错误" detail:@"请求失败，请确认网络连接状态是否正常"];
     [mbHud hide:YES afterDelay:1];
+    [mbHud hide:YES afterDelay:1];
+
+    NSLog(@"aa");
 }
 
 - (void)didClickLogInButton:(UIButton *)sender {
+    [self dismissKeyboard];// 键盘隐藏
+
+
     __block BOOL isCorrect = NO;
     [mbHud showWithTitle:@"Login..." detail:nil];
     [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
-    
     // 异步线程调用接口
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
     dispatch_async(queue, ^{
@@ -176,53 +186,8 @@
             }
         });
     });
-
-
-
     NSLog(@"did click button");
 
-//    isCorrect = [[AccountManager sharedAccountManager] logInWithAccount:accountTextField.text password:passwordTextField.text];
-//    if (isCorrect) { // 登录成功 返回控制页面
-//        //        [self dismissViewControllerAnimated:YES completion:nil];
-//        [self dismissKeyboard];
-//        // 判断是否首次成功登陆，如果首次成功登陆则提示是否使用默认设置
-//        // 判断是否第一次成功登陆程序
-//        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"firstSuccessLaunch"]) {
-//            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"firstSuccessLaunch"];
-//            NSLog(@"第一次成功登陆");
-//            // 提示是否默认配置
-//            alertController = [UIAlertController alertControllerWithTitle:@"是否使用默认配置" message:nil preferredStyle:UIAlertControllerStyleAlert];
-//            [alertController addAction:[UIAlertAction actionWithTitle:@"使用" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-//                AppDelegate *appDelegate = [UIApplication sharedApplication].delegate;
-//                [appDelegate defaultSettingForHouse]; // 使用默认配置
-//                //                [self defaultSettingForHouse]; // 使用默认配置
-//                
-//                [self dismissViewControllerAnimated:YES completion:nil];
-//            }]];
-//            [alertController addAction:[UIAlertAction actionWithTitle:@"不使用" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-//                [self dismissViewControllerAnimated:YES completion:nil];
-//                
-//            }]];
-//            [self presentViewController:alertController animated:YES completion:nil];
-//        }
-//        else{
-//            [self dismissViewControllerAnimated:YES completion:nil];
-//            NSLog(@"不是第一次成功登陆");
-//        }
-//        
-//        // UITabBarController *initViewController = [self.storyboard instantiateInitialViewController];
-//        //    [self presentViewController:initViewController animated:YES completion:nil];
-//        //
-//    } else {
-//        //alert controller init
-//        alertController = [UIAlertController alertControllerWithTitle:@"账号或密码错误" message:nil preferredStyle:UIAlertControllerStyleAlert];
-//        [alertController addAction:[UIAlertAction actionWithTitle:@"好" style:UIAlertActionStyleCancel handler:nil]];
-//        [alertController addAction:[UIAlertAction actionWithTitle:@"重设密码" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-//            [self performSegueWithIdentifier:resetPasswordIdentifier sender:self];
-//        }]];
-//        
-//        [self presentViewController:alertController animated:YES completion:nil]; // 失败
-//    }
 }
 - (void)dismissKeyboard {
     //    [self.view endEditing:YES];

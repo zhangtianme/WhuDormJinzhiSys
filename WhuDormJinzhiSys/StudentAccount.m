@@ -30,6 +30,8 @@
 
 - (id)init {
     NSLog(@"init Account Manager");
+    
+
     // 给账户分配空间
     if (self = [super init]) {
         _userID = [[NSString alloc] init];

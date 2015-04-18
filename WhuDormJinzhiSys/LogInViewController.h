@@ -10,13 +10,12 @@
 
 @interface LogInViewController : UIViewController
 
-@property (strong, nonatomic) UITextField *accountTextField;  // 账号
+@property (strong, nonatomic) UITextField *accountTextField;  // 账号
 @property (strong, nonatomic) UITextField *passwordTextField; // 密码
 @property (strong, nonatomic) UIButton *logInButton;          // 登录
 
 @property (strong, nonatomic) UIImageView *headIconImage;       // 标题图标
-@property (strong, nonatomic) UIImageView *buttomIconImage;       // 底部图标
 
+@property (strong, nonatomic) UIImageView *buttomIconImage;    // 底部图标
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
-
 @end

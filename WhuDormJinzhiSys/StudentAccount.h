@@ -28,7 +28,8 @@
 @property (nonatomic, strong)NSString *unit;        // 单元
 @property (nonatomic, strong)NSString *roomNum;     // 房间号
 // 空调部分
-@property (nonatomic, strong)NSString *subsidyDegreeAirCon;     // 剩余补贴 度数
+@property (nonatomic, strong)NSString *subsidyDegreeAirCon;   
+// 剩余补贴 度数
 @property (nonatomic, strong)NSString *chargebackDegreeAirCon;  // 余额 度数
 @property (nonatomic, strong)NSString *chargebackAirCon;        // 余额
 @property (nonatomic, strong)NSString *subsidyAirCon;           // 剩余补贴

@@ -24,9 +24,9 @@
     dispatch_once(&onceToken, ^{
         sharedAccountManager = [[self alloc] init];
     });
+    
     return sharedAccountManager;
 }
-
 
 //- (id)init {
 //    NSLog(@"init Account Manager");
