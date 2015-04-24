@@ -12,32 +12,31 @@
 #define defaultWebServiceUrl @"http://210.42.122.127:8080/"
 #define defaultNameSpace @"http://www.suntrans.net/"
 
-#define logInMethodName         @"LogIn"
-#define checkStuName            @"Check_Stu"
-#define queryUserInfoName       @"Inquiry_UserInfo"
-#define queryChannelStatName    @"Inquiry_Channel_RoomID"
-#define queryRoomName           @"Inquiry_Room_RoomID"
-#define queryRechargeName       @"Inquiry_ReCharge_RoomID"
-#define queryBuildingName       @"Inquiry_Building"
-#define queryHisDataName        @"Inquiry_HisData_RoomID"
-#define queryStateName          @"Inquiry_States_RoomID"
-#define queryChargeBackName     @"Inquiry_Chargeback_RoomID"
-#define queryBillMonthName      @"Inquiry_BillMonth_RoomID"
+#define logInMethodName        @"LogIn"
+#define checkStuName           @"Check_Stu"
+#define queryUserInfoName      @"Inquiry_UserInfo"
+#define queryChannelStatName   @"Inquiry_Channel_RoomID"
+#define queryRoomName          @"Inquiry_Room_RoomID"
+#define queryRechargeName      @"Inquiry_ReCharge_RoomID"
+#define queryBuildingName      @"Inquiry_Building"
+#define queryHisDataName       @"Inquiry_HisData_RoomID"
+#define queryStateName         @"Inquiry_States_RoomID"
+#define queryChargeBackName    @"Inquiry_Chargeback_RoomID"
+#define queryBillMonthName     @"Inquiry_BillMonth_RoomID"
+#define queryBuidingDetailName @"Inquiry_Building_Detail"
+#define queryStudentName       @"Inquiry_Student"
+#define modifyPhoneNumName     @"Update_PhoneNum"
+#define modifyPasswordName     @"Update_PWD"
 
 
-#define queryInfoName           @"Inquery_Roles"
-#define queryWeekHistoryName    @"Inquery_Elec"
-#define updatePWDName           @"Update_PWD"
-#define insertOrderName         @"Insert_Order"
-#define insertApplyName         @"Insert_Application"
 
-#define getSRLCDataName @"P_Select_Table"
+#define getSRLCDataName        @"P_Select_Table"
 
-#define onControlName   @"2"
-#define offControlName  @"3"
+#define onControlName          @"2"
+#define offControlName         @"3"
 
-#define logInResultName @"LogInResult"
-#define baseName        @"text"
+#define logInResultName        @"LogInResult"
+#define baseName               @"text"
 
 @implementation WhuControlWebservice
 /**
@@ -123,51 +122,29 @@
     NSDictionary *billMonthDic = [sharedService queryBillMonth:roomID accountType:accountType year:year month:month];
     return billMonthDic;
 }
-
-
-+ (NSArray *)getAllSwitchDataWithSIDs:(NSArray *)SIDs{
-    NSArray *sswitches = [[WhuControlWebservice sharedService] getAllSwitchDataWithSIDs:SIDs];
-    
-    return sswitches;
-}
-// 查询所有角色信息
-+ (NSString *)queryRolesInfoWithID:(NSString *)userID password:(NSString *)password{
+// 查询某栋宿舍的房间详细信息
++ (NSArray *)queryBuildingDetailWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit {
     WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
-    NSString *rolesInfo = [sharedService queryRolesInfoWithID:userID password:password];
-    return rolesInfo;
+    NSArray *roomDetails = [sharedService queryBuildingDetailWithArea:area building:building unit:unit];
+    return roomDetails;
 }
-
-
-// 周用电历史
-+ (NSArray *)queryWeekHistoryWithID:(NSString *)userID password:(NSString *)password stuID:(NSString *)stuID accountType:(NSString *)accountType{
+// 查询所有学生信息
++ (NSArray *)queryStudents{
     WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
-    NSArray *weekHistoryArray = [sharedService queryWeekHistoryWithID:userID password:password stuID:stuID accountType:accountType];
-    
-    return weekHistoryArray;
+    NSArray *studentArray = [sharedService queryStudents];
+    return studentArray;
 }
-
-// 修改密码
-+ (NSString *)updatePWDWithID:(NSString *)userID password:(NSString *)password newPassword:(NSString *)newPassword role:(NSString *)role{
+// 修改手机号 返回0/1
++ (NSString *)modifyPhoneNumWithUserID:(NSString *)userID phoneNum:(NSString *)phoneNum role:(NSString *)role{
     WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
-    [sharedService updatePWDWithID:userID password:password newPassword:newPassword role:role];
-    return @"2";
+    NSString *isSuccess = [sharedService modifyPhoneNumWithUserID:userID phoneNum:phoneNum role:role];
+    return isSuccess;
 }
-// 插入控制命令
-+ (NSString *)insertOrderWithID:(NSString *)userID password:(NSString *)password stuID:(NSString *)stuID accountType:(NSString *)accountType isOn:(NSNumber *)isOn{
+// 修改密码 返回0/1
++ (NSString *)modifyPasswordWithUserID:(NSString *)userID oldPassword:(NSString *)oldPassword modifyPassword:(NSString *)modifyPassword role:(NSString *)role{
     WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
-    if ([isOn boolValue]) { // 打开
-        [sharedService insertOrderWithID:stuID password:password stuID:stuID accountType:accountType orderID:onControlName];
-    } else {
-        [sharedService insertOrderWithID:stuID password:password stuID:stuID accountType:accountType orderID:offControlName];
-    }
-    return @"2";
-}
-
-// 插入用户申请
-+ (NSString *)insertApplyWithID:(NSString *)userID password:(NSString *)password apply:(NSString *)applyInfo{
-    WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
-    [sharedService insertApplyWithID:userID password:password apply:applyInfo];
-    return @"2";
+    NSString *isSuccess = [sharedService modifyPasswordWithUserID:userID oldPassword:oldPassword modifyPassword:modifyPassword role:role];
+    return isSuccess;
 }
 
 
@@ -215,11 +192,12 @@
     NSLog(@"=======同步请求开始 查询用户信息======\n");
     NSMutableArray *arrMsg=[NSMutableArray array];
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
-    
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryUserInfoName soapMessage:arrMsg];
     //    NSLog(@"rootChilds is %@",rootChilds);
+
     NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
     if (!rootChilds) { // 如果为空
+        NSLog(@"userindo nil");
         //   userInfo = @"0";  // 返回没有控制权限
     } else {
         userInfo = (NSMutableDictionary *)[self convertUserInfoDataFromArray:rootChilds];
@@ -314,7 +292,7 @@
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:freq,@"Freq", nil]];
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryHisDataName soapMessage:arrMsg];
-    //   NSLog(@"rootChilds is %@",rootChilds);
+       NSLog(@"rootChilds is %@",rootChilds);
     if (!rootChilds) { // 如果为空
         return rootChilds;
     }
@@ -362,7 +340,6 @@
     NSLog(@"=======同步请求结束======\n");
     return roomArray;
 }
-
 // 查询宿舍某个月充值消费总计
 - (NSDictionary *)queryBillMonth:(NSString *)roomID accountType:(NSString *)accountType year:(NSString *)year month:(NSString *)month{
     NSLog(@"=======同步请求开始 查询宿舍某个月充值消费总计======\n");
@@ -383,169 +360,74 @@
     NSLog(@"=======同步请求结束======\n");
     return billMonth;
 }
-//// 查询宿舍某个月充值消费总计
-//- (NSDictionary *)queryBillMonth:(NSString *)roomID accountType:(NSString *)accountType year:(NSString *)year month:(NSString *)month{
-//    NSLog(@"=======同步请求开始 查询宿舍某个月充值消费总计======\n");
-//    NSMutableArray *arrMsg=[NSMutableArray array];
-//    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:roomID,@"RoomID", nil]];
-//    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:accountType,@"AccountType", nil]];
-//    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:year,@"Year", nil]];
-//    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:month,@"Month", nil]];
-//
-//    NSArray *rootChilds = [self getWebServiceWithMethodName:queryBillMonthName soapMessage:arrMsg];
-//    //    NSLog(@"rootChilds is %@",rootChilds);
-//    if (!rootChilds) { // 如果为空
-//        return rootChilds;
-//    }
-//
-//    NSArray *billMonthArray = [self convertBillMonthDataFromArray:rootChilds];
-//    NSLog(@"=======同步请求结束======\n");
-//    return billMonthArray;
-//}
-
-
-
-
-/**
- * 获取开关的数据，返回值为 开关的字典数组
- **/
-- (NSArray *)getAllSwitchDataWithSIDs:(NSArray *)SIDs
-{
-    NSLog(@"%s begining",__PRETTY_FUNCTION__);
-    NSMutableArray *channelData = [[NSMutableArray alloc] initWithCapacity:30];
-    
-    NSLog(@"=======同步请求开始 获取开关数据======\n");
-    
-    for (NSString *SID in SIDs) {
-        
-        for (int intCID = 1; intCID < 11; intCID++) {
-            NSString *CID =[NSString stringWithFormat:@"%d",intCID];
-            
-            NSMutableArray *arr=[NSMutableArray array];
-            [arr addObject:[NSDictionary dictionaryWithObjectsAndKeys:SID,@"Sid", nil]];
-            [arr addObject:[NSDictionary dictionaryWithObjectsAndKeys:CID,@"Cid", nil]];
-            //      [arr addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"MACAddr,Cname,Ctype,Rname,Iconnumber,Maxi,Uv,Ov,Vrate,Irate",@"Properties", nil]];
-            [arr addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"MACAddr,IPAddr,SSID,Cname,Ctype,Rname,Iconnumber,Maxi,Uv,Ov,Vrate,Irate",@"Properties", nil]];
-            
-            NSArray *rootChilds = [self getWebServiceWithMethodName:getSRLCDataName soapMessage:arr];
-            // webservice 数据修正，待数据库数据好了后 修改
-            NSMutableDictionary *aDic = (NSMutableDictionary *)[self convertDataFromArray:rootChilds];
-            //      [aDic setObject:@"192.168.1.103" forKey:@"IPAddr"];
-            //       [aDic setObject:@"TP-LINK_511" forKey:@"SSID"];
-            
-            [channelData addObject:aDic];
-        }
-        
-    }
-    NSLog(@"=======同步请求结束======\n");
-    //   NSLog(@"channel data is %@",channelData);
-    
-    return channelData;
-}
-// 查询所有角色信息
-- (NSString *)queryRolesInfoWithID:(NSString *)userID password:(NSString *)password
-{
-    NSLog(@"=======同步请求开始 获取角色信息======\n");
-    
+// 查询某栋宿舍的房间详细信息
+- (NSArray *)queryBuildingDetailWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit {
+    NSLog(@"=======同步请求开始 查询某栋宿舍的房间详细信息======\n");
     NSMutableArray *arrMsg=[NSMutableArray array];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:password,@"Password", nil]];
-    
-    NSArray *rootChilds = [self getWebServiceWithMethodName:queryInfoName soapMessage:arrMsg];
-    //    NSLog(@"rootChilds is %@",rootChilds);
-    if (!rootChilds) { // 如果为空
-        return @"2";  // 返回学生用户
-    }
-    
-    NSLog(@"=======同步请求结束======\n");
-    
-    return @"2";
-}
-
-
-// 周用电历史
-- (NSArray *)queryWeekHistoryWithID:(NSString *)userID password:(NSString *)password stuID:(NSString *)stuID accountType:(NSString *)accountType{
-    NSLog(@"=======同步请求开始 周用电历史======\n");
-    
-    NSMutableArray *arrMsg=[NSMutableArray array];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:stuID,@"StudentID", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:accountType,@"AccountType", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:password,@"Password", nil]];
-    
-    NSArray *rootChilds = [self getWebServiceWithMethodName:queryWeekHistoryName soapMessage:arrMsg];
-    //  NSLog(@"rootChilds is %@",rootChilds);
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:area,@"Area", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:building,@"Building", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:unit,@"Unit", nil]];
+    NSArray *rootChilds = [self getWebServiceWithMethodName:queryBuidingDetailName soapMessage:arrMsg];
+    //           NSLog(@"rootChilds is %@",rootChilds);
     if (!rootChilds) { // 如果为空
         return rootChilds;
     }
     
-    NSArray *weekHistoryArray = [self convertWeekHistoryDataFromArray:rootChilds];
+    NSArray *roomDetail = [self convertBuildingDetailDataFromArray:rootChilds];
     NSLog(@"=======同步请求结束======\n");
-    return weekHistoryArray;
+    return roomDetail;
 }
-// 修改密码
-- (NSString *)updatePWDWithID:(NSString *)userID password:(NSString *)password newPassword:(NSString *)newPassword role:(NSString *)role{
-    NSLog(@"=======同步请求开始 修改密码======\n");
+// 查询所有学生信息
+- (NSArray *)queryStudents{
+    NSLog(@"=======同步请求开始 查询所有学生信息======\n");
+    NSMutableArray *arrMsg=[NSMutableArray array];
     
+    NSArray *rootChilds = [self getWebServiceWithMethodName:queryStudentName soapMessage:arrMsg];
+    if (!rootChilds) { // 如果为空
+        return rootChilds;
+    }
+    
+    NSArray *studentArray = [self convertStudentDataFromArray:rootChilds];
+    NSLog(@"=======同步请求结束======\n");
+    return studentArray;
+}
+// 修改手机号 返回0/1
+- (NSString *)modifyPhoneNumWithUserID:(NSString *)userID phoneNum:(NSString *)phoneNum role:(NSString *)role{
+    NSLog(@"=======同步请求开始 修改手机号======\n");
     NSMutableArray *arrMsg=[NSMutableArray array];
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:password,@"Password", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:newPassword,@"New_Password", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:phoneNum,@"PhoneNum", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:role,@"Role", nil]];
+
+    NSArray *rootChilds = [self getWebServiceWithMethodName:modifyPhoneNumName soapMessage:arrMsg];
+    //  NSLog(@"rootChilds is %@",rootChilds);
+    if (!rootChilds) { // 如果为空 失败返回0
+        return @"0";
+    }
+    NSString *isSuccess = [self convertModifyPhoneNumDataFromArray:rootChilds];
+    NSLog(@"=======同步请求结束======\n");
+    return isSuccess;
+}
+
+// 修改密码 返回0/1
+- (NSString *)modifyPasswordWithUserID:(NSString *)userID oldPassword:(NSString *)oldPassword modifyPassword:(NSString *)modifyPassword role:(NSString *)role{
+    NSLog(@"=======同步请求开始 修改密码======\n");
+    NSMutableArray *arrMsg=[NSMutableArray array];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:oldPassword,@"Password", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:modifyPassword,@"New_Password", nil]];
+
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:role,@"Role", nil]];
     
-    NSArray *rootChilds = [self getWebServiceWithMethodName:updatePWDName soapMessage:arrMsg];
-    //   NSLog(@"rootChilds is %@",rootChilds);
-    if (!rootChilds) { // 如果为空
-        return @"0"; // 返回失败
-    }
-    
-    //   NSString *userLimitNumber = [self convertLogDataFromArray:rootChilds];
-    NSLog(@"=======同步请求结束======\n");
-    return @"2";
-}
-// 插入控制命令
-- (NSString *)insertOrderWithID:(NSString *)userID password:(NSString *)password stuID:(NSString *)stuID accountType:(NSString *)accountType orderID:(NSString *)orderID{
-    NSLog(@"=======同步请求开始 插入控制命令======\n");
-    
-    NSMutableArray *arrMsg=[NSMutableArray array];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:password,@"Password", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:stuID,@"StudentID", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:accountType,@"AccountType", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:orderID,@"OrderID", nil]];
-    
-    NSArray *rootChilds = [self getWebServiceWithMethodName:insertOrderName soapMessage:arrMsg];
-    //   NSLog(@"rootChilds is %@",rootChilds);
-    if (!rootChilds) { // 如果为空
-        return @"0";  // 返回失败
-    }
-    
-    //   NSString *userLimitNumber = [self convertLogDataFromArray:rootChilds];
-    NSLog(@"=======同步请求结束======\n");
-    return @"2";
-}
-
-// 插入用户申请
-- (NSString *)insertApplyWithID:(NSString *)userID password:(NSString *)password apply:(NSString *)applyInfo{
-    NSLog(@"=======同步请求开始 插入用户申请======\n");
-    
-    NSMutableArray *arrMsg=[NSMutableArray array];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:password,@"Password", nil]];
-    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:applyInfo,@"Application", nil]];
-    
-    
-    NSArray *rootChilds = [self getWebServiceWithMethodName:insertApplyName soapMessage:arrMsg];
+    NSArray *rootChilds = [self getWebServiceWithMethodName:modifyPasswordName soapMessage:arrMsg];
     //  NSLog(@"rootChilds is %@",rootChilds);
-    if (!rootChilds) { // 如果为空
-        return @"0"; // 返回失败
+    if (!rootChilds) { // 如果为空 失败返回0
+        return @"0";
     }
-    
-    //   NSString *userLimitNumber = [self convertLogDataFromArray:rootChilds];
+    NSString *isSuccess = [self convertModifyPasswordDataFromArray:rootChilds];
     NSLog(@"=======同步请求结束======\n");
-    return @"2";
+    return isSuccess;
 }
-
 
 /**
  * 将 登陆 返回的初步解析的数据 再解析为字典数组
@@ -791,90 +673,72 @@
     return (NSDictionary *)channelState;
     
 }
-//// 查询宿舍某个月充值消费总计
-//- (NSArray *)convertBillMonthDataFromArray:(NSArray *)rootchilds{
-//    NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
-//    if ([[[dataDic allValues] objectAtIndex:0] isKindOfClass:[NSString class]]) { // 返回的数组为空值 则该处为 字符串类型 判断出来 返回空数组
-//        return nil;
-//    }
-//    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
-//    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
-//
-//    NSMutableArray *chargeBacksDatas = [[NSMutableArray alloc] init];
-//    for (NSArray *aArr in [dataDic allValues]) {
-//        NSDictionary *aDic = [aArr objectAtIndex:0];
-//        NSMutableDictionary *aHisData = [[NSMutableDictionary alloc] init];
-//        NSArray *roomKeys = [aDic allKeys];
-//        for (NSString *aKey in roomKeys) {
-//            if ([[aDic objectForKey:aKey] isKindOfClass:[NSArray class]]) { // 如果属性不为空
-//                NSString *aContent = [[[aDic objectForKey:aKey] objectAtIndex:0] objectForKey:baseName];
-//                [aHisData setObject:aContent forKey:aKey];
-//            } else {
-//                [aHisData setObject:@"" forKey:aKey];
-//            }
-//        }
-//        [chargeBacksDatas addObject:aHisData];
-//    }
-//    return (NSArray *)chargeBacksDatas;
-//}
 
-
-- (NSArray *)convertWeekHistoryDataFromArray:(NSArray *)rootchilds{
+// 查询某栋宿舍的房间详细信息
+- (NSArray *)convertBuildingDetailDataFromArray:(NSArray *)rootchilds{
     NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
+    if ([[[dataDic allValues] objectAtIndex:0] isKindOfClass:[NSString class]]) { // 返回的数组为空值 则该处为 字符串类型 判断出来 返回空数组
+        return nil;
+    }
     dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
     dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
-    NSMutableArray *returnArray = [[NSMutableArray alloc] initWithCapacity:2];
     
+    NSMutableArray *roomDetails = [[NSMutableArray alloc] init];
     for (NSArray *aArr in [dataDic allValues]) {
         NSDictionary *aDic = [aArr objectAtIndex:0];
-        NSString *returnStr = [[[[aDic allValues] objectAtIndex:2] objectAtIndex:0] objectForKey:baseName];
-        [returnArray addObject:returnStr];
+        NSMutableDictionary *aRoomData = [[NSMutableDictionary alloc] init];
+        NSArray *roomKeys = [aDic allKeys];
+        for (NSString *aKey in roomKeys) {
+            if ([[aDic objectForKey:aKey] isKindOfClass:[NSArray class]]) { // 如果属性不为空
+                NSString *aContent = [[[aDic objectForKey:aKey] objectAtIndex:0] objectForKey:baseName];
+                [aRoomData setObject:aContent forKey:aKey];
+            } else {
+                [aRoomData setObject:@"" forKey:aKey];
+            }
+        }
+        [roomDetails addObject:aRoomData];
     }
-    // 排序数组
-    NSMutableArray *sortArray = [[NSMutableArray alloc] initWithCapacity:30];
-    NSInteger arrayCount = [returnArray count];
-    for (int i = 0; i<arrayCount; i++) {
-        [sortArray addObject:[NSDictionary dictionaryWithObjectsAndKeys:[returnArray objectAtIndex:i], @"content", [[dataDic allKeys] objectAtIndex:i], @"name", nil]];
-    }
-    NSSortDescriptor *sorter = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES];
-    NSArray *resultArray = [sortArray sortedArrayUsingDescriptors:[NSArray arrayWithObjects:sorter, nil]];
-    
-    for (int i = 0; i<arrayCount; i++) {
-        [returnArray setObject:[[resultArray objectAtIndex:i] objectForKey:@"content"]  atIndexedSubscript:i];
-    }
-    //    NSLog(@"returnarray is %@",returnArray);
-    return [NSArray arrayWithArray:returnArray];
+    return (NSArray *)roomDetails;
 }
-
-- (NSArray *)convertUpdatePWDDataFromArray:(NSArray *)rootchilds{
-    return [NSArray arrayWithObject:@"0"];
-}
-- (NSArray *)convertInsertOrderDataFromArray:(NSArray *)rootchilds{
-    return [NSArray arrayWithObject:@"0"];
-}
-
-
-- (NSArray *)convertInsertApplyDataFromArray:(NSArray *)rootchilds{
-    return [NSArray arrayWithObject:@"0"];
-}
-
-
-
-/**
- * 将 请求开关数据 返回的初步解析的数据 再解析为字典数组
- **/
-- (NSDictionary *)convertDataFromArray:(NSArray *)rootchilds
-{
+// 查询所有学生信息
+- (NSArray *)convertStudentDataFromArray:(NSArray *)rootchilds{
     NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
-    for (int i = 0; i < 3; i++) {
-        dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    if ([[[dataDic allValues] objectAtIndex:0] isKindOfClass:[NSString class]]) { // 返回的数组为空值 则该处为 字符串类型 判断出来 返回空数组
+        return nil;
     }
-    NSMutableDictionary *returnDic = [NSMutableDictionary dictionary];
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
     
-    for (NSString *aKey in [dataDic allKeys]) {
-        [returnDic setObject:[[[dataDic objectForKey:aKey] objectAtIndex:0] objectForKey:baseName] forKey:aKey];
+    NSMutableArray *students = [[NSMutableArray alloc] init];
+    for (NSArray *aArr in [dataDic allValues]) {
+        NSDictionary *aDic = [aArr objectAtIndex:0];
+        NSMutableDictionary *aStudent = [[NSMutableDictionary alloc] init];
+        NSArray *keys = [aDic allKeys];
+        for (NSString *aKey in keys) {
+            if ([[aDic objectForKey:aKey] isKindOfClass:[NSArray class]]) { // 如果属性不为空
+                NSString *aContent = [[[aDic objectForKey:aKey] objectAtIndex:0] objectForKey:baseName];
+                [aStudent setObject:aContent forKey:aKey];
+            } else {
+                [aStudent setObject:@"" forKey:aKey];
+            }
+        }
+        [students addObject:aStudent];
     }
-    return (NSDictionary *)returnDic;
+    return (NSArray *)students;
+}
+// 修改手机号 返回0/1
+- (NSString *)convertModifyPhoneNumDataFromArray:(NSArray *)rootchilds
+{
+    NSMutableDictionary *dataDic= [rootchilds objectAtIndex:0];
+    NSString *retunNumber = [dataDic objectForKey:baseName];
+    return retunNumber;
+}
+// 修改密码 返回0/1
+- (NSString *)convertModifyPasswordDataFromArray:(NSArray *)rootchilds
+{
+    NSMutableDictionary *dataDic= [rootchilds objectAtIndex:0];
+    NSString *retunNumber = [dataDic objectForKey:baseName];
+    return retunNumber;
 }
 
 /**
@@ -892,7 +756,6 @@
 
 #pragma mark - 生成 SoapMessage
 - (NSString*)arrayToSoapMessage:(NSArray*)arr methodName:(NSString*)methodName{
-    
     NSMutableString *soap=[NSMutableString stringWithFormat:@"<%@ xmlns=\"%@\">",methodName,defaultNameSpace];
     for (NSDictionary *item in arr) {
         NSString *key=[[item allKeys] objectAtIndex:0];

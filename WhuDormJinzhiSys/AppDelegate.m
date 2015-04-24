@@ -12,6 +12,7 @@
 @interface AppDelegate (){
     StudentAccount *studentAccount;
     AccountManager *accountManager;
+    AdminAccount *adminAccount;
 }
 
 
@@ -25,12 +26,16 @@
     // 每次启动之前把 属性读出来 如果需要登陆 则在登陆 函数里面再次读取
     studentAccount = [StudentAccount sharedStudentAccount];
     accountManager = [AccountManager sharedAccountManager];
+    adminAccount = [AdminAccount sharedAdminAccount];
     
     studentAccount.stuID = accountManager.userID;
     studentAccount.userID = accountManager.userID;
     studentAccount.role = accountManager.role;
     
-    [[UINavigationBar appearance] setBarTintColor:UIColorFromRGB(0x50A0D2)]; // 不适用半透明的话是原色
+    adminAccount.userID = accountManager.userID;
+    adminAccount.role = accountManager.role;
+    
+    [[UINavigationBar appearance] setBarTintColor:mainBlueColor]; // 不适用半透明的话是原色
     [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, nil]]; // 导航栏标题颜色
     [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]]; // 导航栏各种按钮颜色
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent]; // 导航栏亮色 需要配合plist viewcontroller 某项属性设置为NO
@@ -41,6 +46,9 @@
     if (accountManager.isLogin) { // 已经登录 则跳过登陆页面 根据role决定 push 到学生还是管理员页面
         if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 学生
             [navController pushViewController:[storyboard instantiateViewControllerWithIdentifier:dormInfoIdentity] animated:NO];
+        }else { // 管理员
+            [navController pushViewController:[storyboard instantiateViewControllerWithIdentifier:allDormInfoViewIdentity] animated:NO];
+
         }
     }
 

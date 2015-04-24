@@ -15,6 +15,10 @@
 */
 @property (nonatomic, strong)NSString *userID;
 /**
+ *  用户密码
+ */
+@property (nonatomic, strong)NSString *password;
+/**
  *  角色号 管理员还是学生
  */
 @property (nonatomic, strong)NSString *role;
@@ -49,10 +53,27 @@
  *  @param userID         用户ID
  *  @param curPassword    用户当前密码
  *  @param updatePassword 用户修改的密码
+ *  @param role           用户角色号
  *
  *  @return 修改是否成功
  */
-- (BOOL)modifyPasswordWithUserID:(NSString *)userID curPassword:(NSString *)curPassword updatePassword:(NSString *)updatePassword;
+- (BOOL)modifyPasswordWithUserID:(NSString *)userID curPassword:(NSString *)curPassword updatePassword:(NSString *)updatePassword role:(NSString *)role;
+/**
+ *  修改手机号
+ *
+ *  @param userID         用户ID
+ *  @param updatePhoneNum 用户要修改的手机号
+ *  @param role           用户角色号
+ *
+ *  @return 修改是否成功
+ */
+- (BOOL)modifyPhoneNumWithUserID:(NSString *)userID updatePhoneNum:(NSString *)updatePhoneNum role:(NSString *)role;
+/**
+ *  登出
+ *
+ *  @return 注销登录是否成功
+ */
+- (BOOL)logOut;
 
 
 

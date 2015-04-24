@@ -69,7 +69,7 @@ static NSString * const reuseIdentifier = @"billCell";
     NSLog(@"load tallybook");
     manager = [StudentAccount sharedStudentAccount];
     
-    self.view.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    self.view.backgroundColor = lightBlueColor; // 淡蓝色背景色
 
     // Do any additional setup after loading the view.
     self.navigationItem.title = @"资费记录";
@@ -107,7 +107,7 @@ static NSString * const reuseIdentifier = @"billCell";
 
     // 背景图片
     headBackgroundImageView = [[UIImageView alloc] initWithFrame:headBackgroundImageRect];
-    headBackgroundImageView.backgroundColor = UIColorFromRGB(0x50A0D2);
+    headBackgroundImageView.backgroundColor = mainBlueColor;
     [headBackgroundImageView setImage:[UIImage imageNamed:@"dashline.png"]];
     [self.view addSubview:headBackgroundImageView];
     // 选择日期图片
@@ -180,7 +180,7 @@ static NSString * const reuseIdentifier = @"billCell";
     billTableView.dataSource = self;
     // Register cell classes
     [billTableView registerClass:[BillCell class] forCellReuseIdentifier:reuseIdentifier];
-    billTableView.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    billTableView.backgroundColor = lightBlueColor; // 淡蓝色背景色
     [self.view addSubview:billTableView];
     
 
@@ -207,14 +207,14 @@ static NSString * const reuseIdentifier = @"billCell";
     //    myPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, self.view.frame.size.height/2, self.view.frame.size.width, self.view.frame.size.height/2)];
     myPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, navHeight/2+44 , navWidth, navHeight/2 -44  )]; // 默认的高度 只能阶梯式下降 所以需要再次设置框架
     [myPickerView setFrame:CGRectMake(0, navHeight-myPickerView.frame.size.height , navWidth, myPickerView.frame.size.height)];
-    myPickerView.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色
+    myPickerView.backgroundColor = lightBlueColor; // 淡蓝色
     myPickerView.delegate = self;
     myPickerView.dataSource = self;
     myPickerView.showsSelectionIndicator = YES;
     [self.navigationController.view addSubview:myPickerView];
     // 选择器上的俩个按钮
     toolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, navHeight-myPickerView.frame.size.height -44, navWidth, 44)];
-    [toolBar setTintColor:UIColorFromRGB(0x50A0D2)]; // 主淡蓝色
+    [toolBar setTintColor:mainBlueColor]; // 主蓝色
     [self.navigationController.view addSubview:toolBar];
     NSLog(@"view:%@ naviView:%@",NSStringFromCGRect(self.view.frame),NSStringFromCGRect(self.view.frame));
     //  [pickerView addSubview:toolBar];
@@ -339,7 +339,7 @@ static NSString * const reuseIdentifier = @"billCell";
 //    }
 //    [myHeader setFrame:CGRectMake(0, 0, billTableView.frame.size.height, tableViewHeaderHeight)];
     UIView *myHeader = [[UIView alloc]initWithFrame:CGRectMake(0, 0, billTableView.frame.size.height, tableViewHeaderHeight)];
-    myHeader.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    myHeader.backgroundColor = lightBlueColor; // 淡蓝色背景色
     
     CGFloat width = myHeader.frame.size.width;
     CGFloat height = myHeader.frame.size.height;

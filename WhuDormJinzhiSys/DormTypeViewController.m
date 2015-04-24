@@ -8,7 +8,6 @@
 
 #import "DormTypeViewController.h"
 #import "MacroDefinition.h"
-#import "StudentViewController.h"
 #import "TallyBookViewController.h"
 #import "StatusLogViewController.h"
 #import "HisDataViewController.h"
@@ -22,10 +21,9 @@
     StudentAccount *manager; // 账户管理
     MBProgressHUD *mbHud;
     
-    NSString *selectedHisDataType; // 进入历史数据的类型
+    NSString *selectedHisDataType;  // 进入历史数据的类型
     NSString *selectedHisDataField; // 进入历史数据的类型webservice用
-    NSString *selectedHisDataUnit;  // 进入历史数据的单位
-
+                NSString *selectedHisDataUnit;  // 进入历史数据的单位
 }
 
 @end
@@ -36,7 +34,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     manager = [StudentAccount sharedStudentAccount];
-    self.tableView.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色
+    self.tableView.backgroundColor = lightBlueColor; // 淡蓝色
     
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
@@ -113,7 +111,7 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *myHeader = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, tableViewHeaderHeight)];
-    myHeader.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    myHeader.backgroundColor = lightBlueColor; // 淡蓝色背景色
     
     CGFloat width = myHeader.frame.size.width;
     CGFloat height = myHeader.frame.size.height;
@@ -150,8 +148,6 @@
     return myHeader;
 }
 
-
-
 // 数据获取完毕更新界面
 - (void)updateInterfaceWithWebserviceData {
     // 先更新共有的数据
@@ -160,7 +156,7 @@
     if (manager.unit.length == 0) { // 如果单元为空
         roomDetails = [NSString stringWithFormat:@"%@-%@-%@",manager.area,manager.building,manager.roomNum];
     } else {
-        roomDetails = [NSString stringWithFormat:@"%@-%@%@单元-%@",manager.area,manager.building,manager.unit, manager.roomNum];
+        roomDetails = [NSString stringWithFormat:@"%@-%@%@-%@",manager.area,manager.building,manager.unit, manager.roomNum];
     }
     roomDetailsLabel.text = roomDetails;
     
@@ -228,7 +224,6 @@
         hisDataViewController.hisDataType = selectedHisDataType;
         hisDataViewController.hisDataField = selectedHisDataField;
         hisDataViewController.hisDataUnit = selectedHisDataUnit;
-
     }
 }
 

@@ -11,10 +11,11 @@
 
 
 @interface LogInViewController () {
-    UIAlertController  *alertController;
-    AccountManager *accountManager;
-    StudentAccount *studentAccount;
-    MBProgressHUD *mbHud;
+    UIAlertController * alertController;
+    AccountManager    * accountManager;
+    StudentAccount    * studentAccount;
+    AdminAccount      * adminAccount;
+    MBProgressHUD     * mbHud;
 
 }
 
@@ -28,9 +29,9 @@
     NSLog(@"login  viewdidload");
     accountManager = [AccountManager sharedAccountManager];
     studentAccount = [StudentAccount sharedStudentAccount];
-    
+    adminAccount   = [AdminAccount sharedAdminAccount];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = UIColorFromRGB(0x50A0D2);// 蓝主色
+    self.view.backgroundColor = mainBlueColor;// 蓝主色
     // 初始化
     CGFloat widthZoom         = self.view.frame.size.width/320;// 缩放比例
     CGFloat heightZoom        = self.view.frame.size.height/568;
@@ -142,19 +143,21 @@
 }
 - (void)requestTimeout:(UISwitch *)sender
 {
-    NSLog(@"changestate");
     // 没有收到数据 显示错误指示2秒钟
     [mbHud showWithTitle:@"错误" detail:@"请求失败，请确认网络连接状态是否正常"];
     [mbHud hide:YES afterDelay:1];
-    [mbHud hide:YES afterDelay:1];
-
-    NSLog(@"aa");
 }
 
 - (void)didClickLogInButton:(UIButton *)sender {
     [self dismissKeyboard];// 键盘隐藏
+    UIStoryboard *storyboard = self.storyboard;
 
-
+    if ([passwordTextField.text isEqualToString:@""]) { // 如果为空
+        UIAlertController *alertController1 = [UIAlertController alertControllerWithTitle:@"密码不能为空!" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        [alertController1 addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alertController1 animated:YES completion:nil];
+        return;
+    }
     __block BOOL isCorrect = NO;
     [mbHud showWithTitle:@"Login..." detail:nil];
     [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
@@ -166,19 +169,24 @@
         dispatch_sync(dispatch_get_main_queue(), ^{
             if (isCorrect) { // 登陆成功
                 [mbHud showWithTitle:@"登陆成功" detail:nil];
-                [mbHud hide:YES];
+                [mbHud hide:YES afterDelay:0.5];
                 NSLog(@"role is :%@",accountManager.role);
                 [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
-                // 页面跳转
-                if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 学生
-                    studentAccount.stuID = accountManager.userID;
-                    studentAccount.userID = accountManager.userID;
-                    studentAccount.role = accountManager.role;
-                    [self performSegueWithIdentifier:showDormInfoIdentifier sender:self];
-                } else {
-                    
-                }
-                
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.7 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    // 页面跳转
+                    if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 学生
+                        studentAccount.stuID  = accountManager.userID;
+                        studentAccount.userID = accountManager.userID;
+                        studentAccount.role   = accountManager.role;
+                        //                    [self performSegueWithIdentifier:showDormInfoIdentifier sender:self];
+                        [self.navigationController pushViewController:[storyboard instantiateViewControllerWithIdentifier:dormInfoIdentity] animated:YES];
+                        
+                    } else { // 管理员
+                        adminAccount.userID   = accountManager.userID;
+                        adminAccount.role     = accountManager.role;
+                        [self.navigationController pushViewController:[storyboard instantiateViewControllerWithIdentifier:allDormInfoViewIdentity] animated:YES];
+                    }
+                });
             } else {
                 [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
                 [mbHud showWithTitle:@"用户名或密码错误" detail:nil];

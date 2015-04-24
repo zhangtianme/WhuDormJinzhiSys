@@ -35,8 +35,8 @@
     NSString *monTotalOperate;          // 月操作总数
     NSString *monTotalException;        // 月断电总数
     
-    NSArray  *monOperate;               // 月操作明细
-    NSArray  *monException;             // 月断电明细
+    NSMutableArray  *monOperate;               // 月操作明细
+    NSMutableArray  *monException;             // 月断电明细
     
     NSInteger selectedYear;             // 选择要查询的年月
     NSInteger selectedMonth;
@@ -64,7 +64,7 @@ static NSString * const reuseIdentifier = @"logCell";
     NSLog(@"load tallybook");
     manager = [StudentAccount sharedStudentAccount];
     
-    self.view.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    self.view.backgroundColor = lightBlueColor; // 淡蓝色背景色
     
     // Do any additional setup after loading the view.
     self.navigationItem.title = @"状态日志";
@@ -104,7 +104,7 @@ static NSString * const reuseIdentifier = @"logCell";
     
     // 背景图片
     headBackgroundImageView = [[UIImageView alloc] initWithFrame:headBackgroundImageRect];
-    headBackgroundImageView.backgroundColor = UIColorFromRGB(0x50A0D2);
+    headBackgroundImageView.backgroundColor = mainBlueColor;
     [headBackgroundImageView setImage:[UIImage imageNamed:@"dashline.png"]];
     [self.view addSubview:headBackgroundImageView];
     // 选择日期图片
@@ -176,7 +176,7 @@ static NSString * const reuseIdentifier = @"logCell";
     logTableView.dataSource = self;
     // Register cell classes
 //    [logTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:reuseIdentifier];
-    logTableView.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    logTableView.backgroundColor = lightBlueColor; // 淡蓝色背景色
     [self.view addSubview:logTableView];
     
     
@@ -190,11 +190,7 @@ static NSString * const reuseIdentifier = @"logCell";
     pickerSelectedYear = selectedYear;
     pickerSelectedMonth = selectedMonth;
     
-    if (!mbHud) {  // 初始化指示器
-        mbHud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-        [self.navigationController.view addSubview:mbHud];
-        mbHud.dimBackground = YES;
-    }
+
     
     //
     CGFloat navWidth = self.navigationController.view.frame.size.width;
@@ -202,14 +198,14 @@ static NSString * const reuseIdentifier = @"logCell";
     // 选择器初始化
     myPickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, navHeight/2+44 , navWidth, navHeight/2 -44  )]; // 默认的高度 只能阶梯式下降 所以需要再次设置框架
     [myPickerView setFrame:CGRectMake(0, navHeight-myPickerView.frame.size.height , navWidth, myPickerView.frame.size.height)];
-    myPickerView.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色
+    myPickerView.backgroundColor = lightBlueColor; // 淡蓝色
     myPickerView.delegate = self;
     myPickerView.dataSource = self;
     myPickerView.showsSelectionIndicator = YES;
     [self.navigationController.view addSubview:myPickerView];
     // 选择器上的俩个按钮
     toolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, navHeight-myPickerView.frame.size.height -44, navWidth, 44)];
-    [toolBar setTintColor:UIColorFromRGB(0x50A0D2)]; // 主淡蓝色
+    [toolBar setTintColor:mainBlueColor]; // 主淡蓝色
     [self.navigationController.view addSubview:toolBar];
     NSLog(@"view:%@ naviView:%@",NSStringFromCGRect(self.view.frame),NSStringFromCGRect(self.view.frame));
     //  [pickerView addSubview:toolBar];
@@ -237,8 +233,13 @@ static NSString * const reuseIdentifier = @"logCell";
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    if (!mbHud) {  // 初始化指示器
+        mbHud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+        [self.navigationController.view addSubview:mbHud];
+        mbHud.dimBackground = YES;
+    }
 
-    if(monException == nil) { // 
+    if(monException == nil) { //
         NSLog(@"hah nil");
         [self queryDataAndShowHud]; // 请求数据
 
@@ -269,8 +270,8 @@ static NSString * const reuseIdentifier = @"logCell";
     //        myHeader = [[UITableViewHeaderFooterView alloc] initWithReuseIdentifier:headerIdentifier];
     //    }
     //    [myHeader setFrame:CGRectMake(0, 0, logTableView.frame.size.height, tableViewHeaderHeight)];
-    UIView *myHeader = [[UIView alloc]initWithFrame:CGRectMake(0, 0, logTableView.frame.size.height, tableViewHeaderHeight)];
-    myHeader.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    UIView *myHeader = [[UIView alloc]initWithFrame:CGRectMake(0, 0, logTableView.frame.size.width, tableViewHeaderHeight)];
+    myHeader.backgroundColor = lightBlueColor; // 淡蓝色背景色
     
     CGFloat width = myHeader.frame.size.width;
     CGFloat height = myHeader.frame.size.height;
@@ -339,31 +340,36 @@ static NSString * const reuseIdentifier = @"logCell";
 {
     static NSString *cellIdentifier1 = @"Cell1";
     static NSString *cellIdentifier2 = @"Cell2";
-    UITableViewCell *cell;
-    // 断电明细
-    if (indexPath.section == 1) cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier1];
-        else cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier2];
     
-    if (cell == nil) {
-        if (indexPath.section == 1) {//断电明细
+    if (indexPath.section == 1) { // 断电明细
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier1];
+        if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier: cellIdentifier1];
             [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator]; // 提示可点击
-        } else {
+        }
+        [self configureCell:cell atIndexPath:indexPath];
+        return cell;
+    }else {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier2];
+        if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier: cellIdentifier2];
         }
+        [self configureCell:cell atIndexPath:indexPath];
+        return cell;
     }
-    // Configure the cell
-    [self configureCell:cell atIndexPath:indexPath];
-    
-    return cell;
+//    UITableViewCell *cell;
+//    return cell;
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
   //  BillCell * billCell = (BillCell *)cell;
     //    NSLog(@"configurecell in indexpath%@",indexPath);
     // Return the number of rows in the section.
+    NSLog(@"here indexpath.section:%d",indexPath.section);
     switch (indexPath.section) {
         case 0: {// 操作明细
+            NSLog(@"here1 operate");
+
             NSDictionary *aOperate = [monOperate objectAtIndex:indexPath.row];
             NSArray *allKeys = [aOperate allKeys];
             NSString *type,*onOff;
@@ -375,6 +381,8 @@ static NSString * const reuseIdentifier = @"logCell";
         }break;
             
         case 1: {// 断电明细
+            NSLog(@"here2 exception");
+
             NSDictionary *aException = [monException objectAtIndex:indexPath.row];
             NSArray *allKeys = [aException allKeys];
             NSString *type,*contents;
@@ -387,6 +395,8 @@ static NSString * const reuseIdentifier = @"logCell";
         default:
             break;
     }
+    NSLog(@"here3 end");
+
 }
 #pragma mark - Picker View Data Source
 //返回显示的列数
@@ -514,6 +524,7 @@ static NSString * const reuseIdentifier = @"logCell";
         // 返回主线程 处理结果
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mbHud hide:YES];
+            NSLog(@"should hud miss");
             [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
             // 更新界面
             [self updateInterface];
@@ -551,27 +562,18 @@ static NSString * const reuseIdentifier = @"logCell";
             }
         }
     }
-    monOperate = [operateArr sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+    NSLog(@"here");
+    monOperate = [NSMutableArray arrayWithArray:[operateArr sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         return [[obj2 valueForKey:getTimeName] compare:[obj1 valueForKey:getTimeName]];
-    }];
-    monException = [exceptionArr sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+    }]];
+    NSLog(@"here2");
+
+    monException = [NSMutableArray arrayWithArray:[exceptionArr sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         return [[obj2 valueForKey:getTimeName] compare:[obj1 valueForKey:getTimeName]];
-    }];
+    }]];
     monTotalOperate = [NSString stringWithFormat:@"%lu",monOperate.count];
     monTotalException = [NSString stringWithFormat:@"%lu",monException.count];
-
-//    // 宿舍断电记录
-//    NSArray *nonSortArray = [WhuControlWebservice queryChargeBack:manager.roomID accountType:accountType startTime:startTime endTime:endTime freq:@"24"];
-//    monException = [nonSortArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-//        return [[obj2 valueForKey:getTimeName] compare:[obj1 valueForKey:getTimeName]];
-//    }];
-//    
-////    NSLog(@"chargeback is :%@",monException);
-//    // 查询学生宿舍操作记录
-//    NSArray *nonSortArray2 = [WhuControlWebservice queryRecharge:manager.roomID accountType:accountType startTime:startTime endTime:endTime];
-//    monOperate = [nonSortArray2 sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-//        return [[obj2 valueForKey:getTimeName] compare:[obj1 valueForKey:getTimeName]];
-//    }];
+    NSLog(@"monoperate:%@\n monexception:%@",monOperate,monException);
 
 }
 - (void)updateInterface {
@@ -580,6 +582,7 @@ static NSString * const reuseIdentifier = @"logCell";
     monOperateLabel.text = [NSString stringWithFormat:@"%ld",monTotalOperate.integerValue];
     monExceptionLabel.text = [NSString stringWithFormat:@"%ld",monTotalException.integerValue];
     //    [logTableView beginUpdates];
+    NSLog(@"i came here updte");
     [logTableView reloadData];
     //    [logTableView endUpdates];
     

@@ -12,11 +12,11 @@
 
 
 @interface DormInfoViewController ()<UIScrollViewDelegate> {
-    DormTypeViewController *dormAirCon;     // 空调子视图
-    DormTypeViewController *dormLighting;   // 照明子视图
-    MBProgressHUD *mbHud;
-    StudentAccount *studentAccount; // 账户管理
-    AccountManager *accountManager;
+    DormTypeViewController *dormAirCon;    // 空调子视图
+    DormTypeViewController *dormLighting;  // 照明子视图
+    MBProgressHUD          *mbHud;
+    StudentAccount         *studentAccount;// 账户管理
+    AccountManager         *accountManager;
 
 }
 
@@ -35,10 +35,8 @@
     
     studentAccount = [StudentAccount sharedStudentAccount];
     accountManager = [AccountManager sharedAccountManager];
-    if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {//学生
-        NSLog(@"here set settingbarbutton");
+    if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 如果身份是学生 则左侧为设置 隐藏掉返回按钮
         [self.navigationItem setHidesBackButton:YES];
-
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"setting"] style:UIBarButtonItemStylePlain target:self action:@selector(didClickSettingButton:)];
     } else {
         [self.navigationItem setHidesBackButton:NO];
@@ -89,7 +87,8 @@
 // 进入设置页面
 - (void)didClickSettingButton:(UIBarButtonItem *)sender {
     NSLog(@"didclick sender:%@",sender);
-    [self.navigationController popToRootViewControllerAnimated:YES];
+    [self performSegueWithIdentifier:showSettingsIdentifier sender:self]; // 跳转到设置页面
+//    [self.navigationController popToRootViewControllerAnimated:YES];
     //    [self performSegueWithIdentifier:showSettingIdentifier sender:self];
 }
 - (void)didReceiveMemoryWarning {
@@ -113,7 +112,6 @@
     }
     [mbHud showWithTitle:@"Loading..." detail:nil];
     [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
-
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -135,15 +133,23 @@
         // 查询学生信息
         userInfo = [WhuControlWebservice queryUserInfo:studentAccount.stuID];
         [self getDataFromUserInfo:userInfo];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
+        [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
         // 查询空调用电状态
         airConChannelState = [WhuControlWebservice queryChannelStat:studentAccount.roomID accountType:airConName];
         [self getDataFromChannelState:airConChannelState accountType:airConName];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
+        [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
         // 查询照明用电状态
         lightChannelState = [WhuControlWebservice queryChannelStat:studentAccount.roomID accountType:lightingName];
         [self getDataFromChannelState:lightChannelState accountType:lightingName];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
+        [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
         // 查询某间宿舍学生信息
         students = [WhuControlWebservice queryRoom:studentAccount.roomID];
         [self getDataFromStudents:students];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
+        [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
         // 返回主线程 处理结果
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mbHud hide:YES];
@@ -152,10 +158,8 @@
             // 更新界面
             [dormAirCon updateInterfaceWithWebserviceData];
             [dormLighting updateInterfaceWithWebserviceData];
-
         });
     });
-
 }
 - (void)getDataFromControlLimit:(NSString *)controlLimit {
     studentAccount.controlLimit = controlLimit;
@@ -168,10 +172,15 @@
     if ([allKeys containsObject:professionalName]) studentAccount.professional = [userInfo valueForKey:professionalName];
     if ([allKeys containsObject:roleName]) studentAccount.role = [userInfo valueForKey:roleName];
     if ([allKeys containsObject:stuNameName]) studentAccount.stuName = [userInfo valueForKey:stuNameName];
-    
+    if ([allKeys containsObject:phoneNumName]) {
+        NSLog(@"can i");
+        if ([allKeys containsObject:phoneNumName]) studentAccount.phoneNum = [userInfo valueForKey:phoneNumName];
+    }
+//
+
     if ([allKeys containsObject:areaName]) studentAccount.area = [userInfo valueForKey:areaName];
     if ([allKeys containsObject:buildingName]) studentAccount.building = [userInfo valueForKey:buildingName];
-    if ([allKeys containsObject:unitName]) studentAccount.unit = [userInfo valueForKey:unitName];
+    if ([allKeys containsObject:unitName]) studentAccount.unit =[userInfo valueForKey:unitName];
     if ([allKeys containsObject:roomNumName]) studentAccount.roomNum = [userInfo valueForKey:roomNumName];
     
     if ([allKeys containsObject:subsidyDegreeAirConName]) studentAccount.subsidyDegreeAirCon = [userInfo valueForKey:subsidyDegreeAirConName];
@@ -246,7 +255,7 @@
 //    [dormLighting updateInterfaceWithWebserviceData];
     
 }
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -254,6 +263,6 @@
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
 }
-*/
+
 
 @end

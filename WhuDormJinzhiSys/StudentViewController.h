@@ -13,11 +13,11 @@
 @property (nonatomic, strong) NSDictionary *student; // 学生
 @property (nonatomic, strong) NSString *roomDetail; // 房间信息
 
-@property (weak, nonatomic) IBOutlet UILabel *stuIDLabel;
-@property (weak, nonatomic) IBOutlet UILabel *facultyLabel;
-@property (weak, nonatomic) IBOutlet UILabel *professionaLabel;
-@property (weak, nonatomic) IBOutlet UILabel *phoneLabel;
-@property (weak, nonatomic) IBOutlet UILabel *controlLimitLabel;
+@property (strong, nonatomic) IBOutlet UILabel *stuIDLabel;
+@property (strong, nonatomic) IBOutlet UILabel *facultyLabel;
+@property (strong, nonatomic) IBOutlet UILabel *professionaLabel;
+@property (strong, nonatomic) IBOutlet UILabel *phoneLabel;
+//@property (weak, nonatomic) IBOutlet UILabel *controlLimitLabel;
 @property (strong, nonatomic) IBOutlet UILabel *roomDetailLabel;
 
 

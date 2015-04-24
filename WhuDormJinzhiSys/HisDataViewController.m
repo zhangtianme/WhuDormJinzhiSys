@@ -36,7 +36,7 @@
     // Do any additional setup after loading the view.
     NSLog(@"load hisdata");
     manager = [StudentAccount sharedStudentAccount];
-    self.view.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    self.view.backgroundColor = lightBlueColor; // 淡蓝色背景色
     self.navigationItem.title = hisDataType;
     // 去掉导航栏下的黑框
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
@@ -62,7 +62,7 @@
 
     // 背景图片
     headBackgroundImageView = [[UIImageView alloc] initWithFrame:headBackgroundImageRect];
-    headBackgroundImageView.backgroundColor = UIColorFromRGB(0x50A0D2); // 背景蓝色
+    headBackgroundImageView.backgroundColor = mainBlueColor; // 背景蓝色
     [self.view addSubview:headBackgroundImageView];
     
     // 日期范围选择
@@ -97,8 +97,8 @@
     hisDataGraph.enableReferenceXAxisLines = YES;
     hisDataGraph.enableReferenceYAxisLines = YES;
     hisDataGraph.enableReferenceAxisFrame = YES;
-    hisDataGraph.colorBottom = UIColorFromRGB(0x50A0D2); // 背景蓝色
-    hisDataGraph.colorTop = UIColorFromRGB(0x50A0D2); // 背景蓝色
+    hisDataGraph.colorBottom = mainBlueColor; // 背景蓝色
+    hisDataGraph.colorTop = mainBlueColor; // 背景蓝色
     hisDataGraph.colorLine = UIColorFromRGB(0xFFFFFF); // 曲线白色
     hisDataGraph.colorYaxisLabel = UIColorFromRGB(0xFFFFFF); // YLabel白色
     hisDataGraph.colorXaxisLabel = UIColorFromRGB(0xFFFFFF); // XLabel白色
@@ -117,7 +117,7 @@
     hisDataTableView.dataSource = self;
     // Register cell classes
     //    [logTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:reuseIdentifier];
-    hisDataTableView.backgroundColor = UIColorFromRGB(0XE9F2F9); // 淡蓝色背景色
+    hisDataTableView.backgroundColor = lightBlueColor; // 淡蓝色背景色
     [self.view addSubview:hisDataTableView];
     
 }
@@ -152,6 +152,7 @@
         // 返回主线程 处理结果
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mbHud hide:YES];
+
             [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
             // 更新界面
             [self updateInterface];
@@ -186,6 +187,7 @@
     NSString *dayEndTime = [NSString stringWithFormat:@"%@:00",dayEndTimeStr];
     // 请求数据
     NSArray *nonSortArray = [WhuControlWebservice queryHisData:manager.roomID accountType:accountType field:hisDataField startTime:dayStartTime endTime:dayEndTime freq:@"1"];
+    NSLog(@"roomid:%@ accounttype:%@ field:%@ starttime:%@ endtime:%@",manager.roomID,accountType,hisDataField,dayStartTime,dayEndTime);
     dayHisData = [nonSortArray sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
         return [[obj2 valueForKey:getTimeName] compare:[obj1 valueForKey:getTimeName]];
     }];
@@ -222,7 +224,7 @@
         default:break;
     }
     [hisDataTableView reloadData];
-    [hisDataTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES]; // 滚动到顶部
+//    [hisDataTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES]; // 滚动到顶部
     [hisDataGraph reloadGraph];
 
 }

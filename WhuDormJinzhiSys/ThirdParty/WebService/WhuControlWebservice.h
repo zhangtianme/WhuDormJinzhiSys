@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import "ASIHTTPRequest.h"
-#import "Student.h"
-#import "Room.h"
+//#import "Student.h"
+//#import "Room.h"
 
 @interface WhuControlWebservice : NSObject
 
@@ -19,7 +19,6 @@
  * 单例模式，初始化，仅存在一个实例对象不过注意在调用的地方只能使用该方法初始化，不然会清空前面的数据
  **/
 + (WhuControlWebservice *)sharedService;
-+ (NSArray *)getAllSwitchDataWithSIDs:(NSArray *)SIDs;
 
 // 登录 返回角色号 0 1-9
 + (NSString *)logInWithID:(NSString *)userID password:(NSString *)password;
@@ -43,7 +42,15 @@
 + (NSArray *)queryChargeBack:(NSString *)roomID accountType:(NSString *)accountType startTime:(NSString *)startTime endTime:(NSString *)endTime freq:(NSString *)freq;
 // 查询宿舍某个月充值消费总计
 + (NSDictionary *)queryBillMonth:(NSString *)roomID accountType:(NSString *)accountType year:(NSString *)year month:(NSString *)month;
+// 查询某栋宿舍的房间详细信息
++ (NSArray *)queryBuildingDetailWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit;
+// 查询所有学生信息
++ (NSArray *)queryStudents;
+// 修改手机号 返回0/1
++ (NSString *)modifyPhoneNumWithUserID:(NSString *)userID phoneNum:(NSString *)phoneNum role:(NSString *)role;
 
+// 修改密码 返回0/1
++ (NSString *)modifyPasswordWithUserID:(NSString *)userID oldPassword:(NSString *)oldPassword modifyPassword:(NSString *)modifyPassword role:(NSString *)role;
 
 
 /*Inquiry_BillMonth_RoomID
@@ -63,17 +70,5 @@
  */
 
 // 暂时做到这里 还有一部分webservice功能暂时不用添加
-
-
-// 查询所有角色信息
-+ (NSString *)queryRolesInfoWithID:(NSString *)userID password:(NSString *)password;
-// 周用电历史 倒数1-7天最后一个为7天总和
-+ (NSArray *)queryWeekHistoryWithID:(NSString *)userID password:(NSString *)password stuID:(NSString *)stuID accountType:(NSString *)accountType;
-// 修改密码
-+ (NSString *)updatePWDWithID:(NSString *)userID password:(NSString *)password newPassword:(NSString *)newPassword role:(NSString *)role;
-// 插入控制命令
-+ (NSString *)insertOrderWithID:(NSString *)userID password:(NSString *)password stuID:(NSString *)stuID accountType:(NSString *)accountType isOn:(NSNumber *)isOn;
-// 插入用户申请
-+ (NSString *)insertApplyWithID:(NSString *)userID password:(NSString *)password apply:(NSString *)applyInfo;
 
 @end

@@ -12,10 +12,10 @@
 // 是否登陆名字
 #define isLoginName @"isLogin"
 #define userIDName  @"useID"
-#define roleName    @"role"
+#define passwordName  @"password"
 
 @implementation AccountManager
-@synthesize isLogin=_isLogin,userID=_userID,role=_role;
+@synthesize isLogin=_isLogin,userID=_userID,role=_role,password=_password;
 
 + (AccountManager *)sharedAccountManager
 {
@@ -61,6 +61,15 @@
     return _userID;
 }
 
+- (void)setPassword:(NSString *)password {
+    _password = password;
+    [[NSUserDefaults standardUserDefaults]setObject:_password forKey:passwordName];
+}
+- (NSString *)password {
+    _password =[[NSUserDefaults standardUserDefaults] stringForKey:passwordName];
+    return _password;
+}
+
 - (void)setRole:(NSString *)role {
     _role = role;
     [[NSUserDefaults standardUserDefaults]setObject:_role forKey:roleName];
@@ -72,20 +81,60 @@
 
 - (BOOL)logInWithUserID:(NSString *)userID password:(NSString *)password {
     self.role = [WhuControlWebservice logInWithID:userID password:password];
-    self.userID =userID;
-    
+
     if ([self.role isEqualToString:@"0"]) {
         self.isLogin = NO;
         return NO;
     }
+    self.userID =userID;
+    self.password =password;
     self.isLogin = YES;
     return YES;
 }
 
-- (BOOL)modifyPasswordWithUserID:(NSString *)userID curPassword:(NSString *)curPassword updatePassword:(NSString *)updatePassword {
-    return YES;
+//- (BOOL)modifyPasswordWithUserID:(NSString *)userID curPassword:(NSString *)curPassword updatePassword:(NSString *)updatePassword role:(NSString *)role {
+//    NSString *isSuccess = [WhuControlWebservice modifyPasswordWithUserID:userID oldPassword:curPassword modifyPassword:updatePassword role:rol];
+//    if (isSuccess) {// 修改密码成功
+//        self.password =
+//    }
+//    return isSuccess.boolValue;
+//}
+
+- (BOOL)modifyPasswordWithUserID:(NSString *)userID curPassword:(NSString *)curPassword updatePassword:(NSString *)updatePassword role:(NSString *)role {
+    NSString *isSuccess = [WhuControlWebservice modifyPasswordWithUserID:userID oldPassword:curPassword modifyPassword:updatePassword role:role];
+    if (isSuccess.boolValue) {// 修改密码成功
+        self.password = updatePassword;
+        NSLog(@"success");
+    }
+    return isSuccess.boolValue;
 }
 
+- (BOOL)modifyPhoneNumWithUserID:(NSString *)userID updatePhoneNum:(NSString *)updatePhoneNum role:(NSString *)role {
+    NSString *isSuccess = [WhuControlWebservice modifyPhoneNumWithUserID:userID phoneNum:updatePhoneNum role:role];
+    return isSuccess.boolValue;
+}
+
+- (BOOL)logOut {
+    AdminAccount *adminAccount = [AdminAccount sharedAdminAccount];
+    StudentAccount *studentAccount = [StudentAccount sharedStudentAccount];
+    self.isLogin = NO;
+//    self = nil; 推出前 先把某些信息 删除
+    if (self.role.integerValue==1||self.role.integerValue==2) {// 学生
+        studentAccount.phoneNum = nil;
+        studentAccount.userID = nil;
+        studentAccount.stuID = nil;
+
+    } else {
+        adminAccount.area = nil;
+        adminAccount.building = nil;
+        adminAccount.unit = nil;
+        adminAccount.phoneNum = nil;
+    }
+
+    
+    NSLog(@"adminaccount role:%@",adminAccount.role);
+    return YES;
+}
 
 
 @end
