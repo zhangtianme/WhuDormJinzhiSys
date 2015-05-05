@@ -17,11 +17,14 @@
 #import "BillCell.h"
 #import "RoomCell.h"
 #import "RoomHeader.h"
-#import "BEMSimpleLineGraphView.h" // 曲线绘制
+#import "BEMSimpleLineGraphView.h"  // 曲线绘制
 #import "IQKeyboardManager.h"       // 键盘居中加左右方向键
-#import "DropDownListView.h"    // 下拉菜单
-#import "MJRefresh.h"
+#import "DropDownListView.h"        // 下拉菜单
+#import "MJRefresh.h"               // 下拉刷新
 #import "StudentViewController.h"
+#import "PHJTransformPinyin.h"      // 汉字转拼音
+#import "LogInViewController.h"  //登陆界面
+
 //#import "UILabel+VerticalAlign.h"
 
 #define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
@@ -31,8 +34,22 @@
 
 #define mainBlueColor [UIColor colorWithRed:0X50/255.0 green:0XA0/255.0 blue:0XD2/255.0 alpha:1.0]  // 主蓝色
 #define lightBlueColor [UIColor colorWithRed:0XDC/255.0 green:0XEC/255.0 blue:0XF6/255.0 alpha:1.0] // 淡蓝色
+#define darkBlueColor [UIColor colorWithRed:0X38/255.0 green:0X74/255.0 blue:0X9B/255.0 alpha:1.0] // 更浓的蓝色
+
 // 请求超时 时间
 #define timeoutRequest  10       // 10秒超时
+#define loginRequestError    @"1000" // 登陆请求失败
+
+// 与金智系统有关
+#define jinzhiBundle1  @"com.wisedu.WuHanDaXueIN" // 金智企业版的bundleid
+#define jinzhiBundle2  @"com.wisedu.ZhangShangWuDa" // 金智个人版的bundleid
+#define jinzhiScheme   @"mcpWhuHan://" // 调用金智软件的scheme
+#define rechargeUrl    @"http://10.100.0.4:8001" // 充值网站
+
+#define versionUpdateUrl @"http://10.100.0.4:8001" // 软件升级网站
+#define iOSTypeName     @"iOS"  //
+#define versionNameName @"VersionName"  //
+#define urlName     @"URL" //读取出来的url
 
 // 视图控制器的标识
 #define dormAirConIdentity      @"dormAirCon"
@@ -66,13 +83,16 @@
 #define showModifyPhoneIdentifier    @"showModifyPhone"   // show修改手机号
 #define showModifyPasswordIdentifier @"showModifyPassword"// show修改密码
 #define showAboutIdentifier          @"showAbout"         // show关于页面
+#define showSearchIdentifier         @"showSearch"        // show搜索页面
 
+
+#define stuPYNameName                @"StuPYName"         // 学生拼音名字
 
 
 // accountManager 的各参数名字
-#define userIDName                 @"useID"          // 用户账号
-#define roleName                   @"Role"           // 角色号
-#define stuIDName                  @"StudentID"      // 学号
+#define userIDName                   @"useID"             // 用户账号
+#define roleName                     @"Role"              // 角色号
+#define stuIDName                    @"StudentID"         // 学号
 //  querycheckStu 内各参数
 // 直接返回nsstring类型不是nsdictionary无需解析
 //  queryUserInfo 各参数的名字
@@ -81,6 +101,7 @@
 #define professionalName           @"Professional"   // 专业
 //#define roleName                   @"Role"           // 角色号
 #define stuNameName                @"SName"          // 学生名字
+
 
 #define areaName                   @"Area"           // 区域
 #define buildingName               @"Building"       // 建筑

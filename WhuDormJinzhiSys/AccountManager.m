@@ -13,9 +13,13 @@
 #define isLoginName @"isLogin"
 #define userIDName  @"useID"
 #define passwordName  @"password"
+#define roomSearchHisName  @"roomSearchHis"
+#define studentSearchHisName  @"studentSearchHis"
+
+#define hisNums 5 // 搜索记录限制5条
 
 @implementation AccountManager
-@synthesize isLogin=_isLogin,userID=_userID,role=_role,password=_password;
+@synthesize isLogin=_isLogin,userID=_userID,role=_role,password=_password,roomSearchHis=_roomSearchHis,studentSearchHis=_studentSearchHis;
 
 + (AccountManager *)sharedAccountManager
 {
@@ -79,17 +83,70 @@
     return _role;
 }
 
-- (BOOL)logInWithUserID:(NSString *)userID password:(NSString *)password {
+- (void)setRoomSearchHis:(NSArray *)roomSearchHis {
+    _roomSearchHis = roomSearchHis;
+    [[NSUserDefaults standardUserDefaults]setObject:_roomSearchHis forKey:roomSearchHisName];
+}
+- (NSArray *)roomSearchHis {
+    _roomSearchHis =[[NSUserDefaults standardUserDefaults] arrayForKey:roomSearchHisName];
+//    // 去重 加排序
+//    _roomSearchHis = [[NSSet setWithArray:_roomSearchHis] allObjects];
+//    if (_roomSearchHis.count>hisNums) { // 超过范围
+//        NSMutableArray *mutableArr = [_roomSearchHis mutableCopy];
+//        [mutableArr removeObjectsInRange:NSMakeRange(hisNums-1, _roomSearchHis.count-hisNums)];
+//        _roomSearchHis = (NSArray *)mutableArr;
+//    }
+//    [self setRoomSearchHis:_roomSearchHis];
+    return _roomSearchHis;
+}
+- (void)insertObject:(NSDictionary *)object inRoomSearchHisAtIndex:(NSUInteger)index {
+    NSMutableArray *tempRoomSearchHis = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] arrayForKey:roomSearchHisName]];
+    if (!tempRoomSearchHis) { // if nil
+        NSLog(@"roomsearchnil");
+        tempRoomSearchHis = [NSMutableArray arrayWithCapacity:1];
+    }
+    // 插入前先去重
+    [tempRoomSearchHis removeObject:object];
+    [tempRoomSearchHis insertObject:object atIndex:index];
+    if (tempRoomSearchHis.count>hisNums) { // 超过范围
+        [tempRoomSearchHis removeObjectsInRange:NSMakeRange(hisNums-1, tempRoomSearchHis.count-hisNums)];
+    }
+    [[NSUserDefaults standardUserDefaults]setObject:tempRoomSearchHis forKey:roomSearchHisName];
+}
+
+- (void)setStudentSearchHis:(NSArray *)studentSearchHis{
+    _studentSearchHis = studentSearchHis;
+    [[NSUserDefaults standardUserDefaults]setObject:_studentSearchHis forKey:studentSearchHisName];
+}
+- (NSArray *)studentSearchHis{
+    _studentSearchHis =[[NSUserDefaults standardUserDefaults] arrayForKey:studentSearchHisName];
+    return _studentSearchHis;
+}
+- (void)insertObject:(NSDictionary *)object inStudentSearchHisAtIndex:(NSUInteger)index{
+    NSMutableArray *tempStudentSearchHis = [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults] arrayForKey:studentSearchHisName]];
+    if (!tempStudentSearchHis) { // if nil
+        tempStudentSearchHis = [NSMutableArray arrayWithCapacity:1];
+    }
+    // 插入前先去重
+    [tempStudentSearchHis removeObject:object];
+    [tempStudentSearchHis insertObject:object atIndex:index];
+    if (tempStudentSearchHis.count>hisNums) { // 超过范围
+        [tempStudentSearchHis removeObjectsInRange:NSMakeRange(hisNums-1, tempStudentSearchHis.count-hisNums)];
+    }
+    [[NSUserDefaults standardUserDefaults]setObject:tempStudentSearchHis forKey:studentSearchHisName];
+}
+
+- (NSString *)logInWithUserID:(NSString *)userID password:(NSString *)password {
     self.role = [WhuControlWebservice logInWithID:userID password:password];
 
-    if ([self.role isEqualToString:@"0"]) {
+    if ([self.role isEqualToString:@"0"]||[self.role isEqualToString:loginRequestError]) { // 登陆失败
         self.isLogin = NO;
-        return NO;
+    } else {
+        self.userID =userID;
+        self.password =password;
+        self.isLogin = YES;
     }
-    self.userID =userID;
-    self.password =password;
-    self.isLogin = YES;
-    return YES;
+    return self.role;
 }
 
 //- (BOOL)modifyPasswordWithUserID:(NSString *)userID curPassword:(NSString *)curPassword updatePassword:(NSString *)updatePassword role:(NSString *)role {
@@ -117,6 +174,7 @@
 - (BOOL)logOut {
     AdminAccount *adminAccount = [AdminAccount sharedAdminAccount];
     StudentAccount *studentAccount = [StudentAccount sharedStudentAccount];
+    self.userID = nil;
     self.isLogin = NO;
 //    self = nil; 推出前 先把某些信息 删除
     if (self.role.integerValue==1||self.role.integerValue==2) {// 学生
@@ -130,8 +188,10 @@
         adminAccount.unit = nil;
         adminAccount.phoneNum = nil;
     }
-
-    
+    // 退出的时候把搜索历史记录清空
+    self.studentSearchHis = nil;
+    self.roomSearchHis = nil;
+    NSLog(@"stu:%@ room:%@",self.studentSearchHis,self.roomSearchHis);
     NSLog(@"adminaccount role:%@",adminAccount.role);
     return YES;
 }

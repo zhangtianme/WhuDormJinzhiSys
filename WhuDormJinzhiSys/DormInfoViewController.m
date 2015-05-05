@@ -17,7 +17,6 @@
     MBProgressHUD          *mbHud;
     StudentAccount         *studentAccount;// 账户管理
     AccountManager         *accountManager;
-
 }
 
 @property (nonatomic, strong) UIScrollView *scrollView;
@@ -35,9 +34,13 @@
     
     studentAccount = [StudentAccount sharedStudentAccount];
     accountManager = [AccountManager sharedAccountManager];
-    if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 如果身份是学生 则左侧为设置 隐藏掉返回按钮
+    if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 如果身份是学生 则右侧为设置 隐藏掉返回按钮
         [self.navigationItem setHidesBackButton:YES];
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"setting"] style:UIBarButtonItemStylePlain target:self action:@selector(didClickSettingButton:)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"setting"] style:UIBarButtonItemStylePlain target:self action:@selector(didClickSettingButton:)];
+        if ([accountManager.wakeUpAppBundle isEqualToString:jinzhiBundle1]||[accountManager.wakeUpAppBundle isEqualToString:jinzhiBundle2]) { // 从金智平台唤醒则添加返回按钮
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回平台" style:UIBarButtonItemStylePlain target:self action:@selector(didClickReturnButton:)];
+        }
+
     } else {
         [self.navigationItem setHidesBackButton:NO];
     }
@@ -60,6 +63,7 @@
     self.scrollView.delegate = self;
     [self.scrollView scrollRectToVisible:CGRectMake(0, 0, viewWidth, viewHeight) animated:YES];
     [self.view addSubview:self.scrollView];
+
     
     // 空调照明 俩个控制器
     dormAirCon = [self.storyboard instantiateViewControllerWithIdentifier:dormAirConIdentity];
@@ -70,59 +74,83 @@
     //dorm airconditioner list
     dormAirCon.view.frame = CGRectMake(0, 0, viewWidth, viewHeight );
     [dormAirCon willMoveToParentViewController:self];
-    [self.scrollView addSubview:dormAirCon.view];
+    [self.scrollView addSubview:dormAirCon.tableView];
     [self addChildViewController:dormAirCon];
     [dormAirCon didMoveToParentViewController:self];
     
     //dorm lighting list
     dormLighting.view.frame = CGRectMake(viewWidth, 0, viewWidth, viewHeight);
     [dormLighting willMoveToParentViewController:self];
-    [self.scrollView addSubview:dormLighting.view];
+    [self.scrollView addSubview:dormLighting.tableView];
     [self addChildViewController:dormLighting];
     [dormLighting didMoveToParentViewController:self];
-    
+    NSLog(@"%s begining",__PRETTY_FUNCTION__);
 
+    [dormAirCon.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    [dormLighting.tableView addHeaderWithTarget:self action:@selector(headerRereshing)];
 
-}
-// 进入设置页面
-- (void)didClickSettingButton:(UIBarButtonItem *)sender {
-    NSLog(@"didclick sender:%@",sender);
-    [self performSegueWithIdentifier:showSettingsIdentifier sender:self]; // 跳转到设置页面
-//    [self.navigationController popToRootViewControllerAnimated:YES];
-    //    [self performSegueWithIdentifier:showSettingIdentifier sender:self];
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-- (void)requestTimeout:(UISwitch *)sender
-{
-    NSLog(@"changestate");
-    // 没有收到数据 显示错误指示2秒钟
-    [mbHud showWithTitle:@"错误" detail:@"请求失败，请确认网络连接状态是否正常"];
-    [mbHud hide:YES afterDelay:1];
-}
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if (!mbHud) {  // 初始化指示器
         mbHud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-        
         [self.navigationController.view addSubview:mbHud];
         mbHud.dimBackground = YES;
     }
-    [mbHud showWithTitle:@"Loading..." detail:nil];
-    [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
+    NSLog(@"studentAccount.roomID:%@",studentAccount.roomID);
+    if ([studentAccount.roomID isEqualToString:@""]) { // 没有数据请求
+        [self queryDataAndShowHud]; // 请求数据
+    }
+    [dormAirCon updateInterfaceWithWebserviceData];
+    [dormLighting updateInterfaceWithWebserviceData];
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    NSLog(@"info view did appear");
+}
+- (void)headerRereshing
+{
+    [self queryDataAndShowHud]; // 手动刷新无条件请求数据
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        // 刷新表格
+        // (最好在刷新表格后调用)调用endRefreshing可以结束刷新状态
+        [dormAirCon.tableView headerEndRefreshing];
+        [dormLighting.tableView headerEndRefreshing];
+        //        [_studentTableView headerEndRefreshing];
+        
+    });
+}
+- (void)requestTimeout:(UISwitch *)sender
+{
+    // 没有收到数据 显示错误指示2秒钟
+    [mbHud showWithTitle:@"错误" detail:@"请求失败，请确认网络连接状态是否正常"];
+    [mbHud hide:YES afterDelay:1];
+}
+// 进入设置页面
+- (void)didClickSettingButton:(UIBarButtonItem *)sender {
+    [self performSegueWithIdentifier:showSettingsIdentifier sender:self]; // 跳转到设置页面
+}
+
+// 返回金智平台
+- (void)didClickReturnButton:(UIBarButtonItem *)sender {
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:jinzhiScheme]];
+}
+/**
+ *  请求数据
+ */
+- (void)queryDataAndShowHud {
+    [mbHud showWithTitle:@"数据加载中..." detail:nil];
+    [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
     // 加了block 才能在block里面有写的权限
     __block NSString *controlLimit = [[NSString alloc] init]; //
     __block NSDictionary *userInfo = [[NSDictionary alloc] init]; //
     __block NSDictionary *airConChannelState = [[NSDictionary alloc] init];
     __block NSDictionary *lightChannelState = [[NSDictionary alloc] init];
     __block NSArray *students = [[NSArray alloc] init];
-
+    
     // 异步线程调用接口
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
     dispatch_async(queue, ^{
@@ -152,9 +180,9 @@
         [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
         // 返回主线程 处理结果
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [mbHud hide:YES];
+            [mbHud showWithTitle:@"数据加载成功!" detail:nil];
+            [mbHud hide:YES afterDelay:0.5];
             [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
-            NSLog(@"deal with finish");
             // 更新界面
             [dormAirCon updateInterfaceWithWebserviceData];
             [dormLighting updateInterfaceWithWebserviceData];
@@ -173,10 +201,8 @@
     if ([allKeys containsObject:roleName]) studentAccount.role = [userInfo valueForKey:roleName];
     if ([allKeys containsObject:stuNameName]) studentAccount.stuName = [userInfo valueForKey:stuNameName];
     if ([allKeys containsObject:phoneNumName]) {
-        NSLog(@"can i");
         if ([allKeys containsObject:phoneNumName]) studentAccount.phoneNum = [userInfo valueForKey:phoneNumName];
     }
-//
 
     if ([allKeys containsObject:areaName]) studentAccount.area = [userInfo valueForKey:areaName];
     if ([allKeys containsObject:buildingName]) studentAccount.building = [userInfo valueForKey:buildingName];

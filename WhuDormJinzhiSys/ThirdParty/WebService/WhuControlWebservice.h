@@ -48,10 +48,13 @@
 + (NSArray *)queryStudents;
 // 修改手机号 返回0/1
 + (NSString *)modifyPhoneNumWithUserID:(NSString *)userID phoneNum:(NSString *)phoneNum role:(NSString *)role;
-
 // 修改密码 返回0/1
 + (NSString *)modifyPasswordWithUserID:(NSString *)userID oldPassword:(NSString *)oldPassword modifyPassword:(NSString *)modifyPassword role:(NSString *)role;
+// 插入控制命令 01 返回0/1
++ (NSString *)insertOrderWithUserID:(NSString *)userID roomID:(NSString *)roomID accountType:(NSString *)accountType orderID:(NSString *)orderID;
 
+// 检查版本 iOS 返回dictionary
++ (NSDictionary *)queryVersionWithType:(NSString *)type;
 
 /*Inquiry_BillMonth_RoomID
  <?xml version="1.0" encoding="utf-8"?>

@@ -7,6 +7,7 @@
 //
 #import "WhuControlWebservice.h"
 #import "GDataXMLNode.h"
+#import "MacroDefinition.h"
 
 //#define defaultWebServiceUrl @"http://www.suntrans.net:8099/"
 #define defaultWebServiceUrl @"http://210.42.122.127:8080/"
@@ -27,6 +28,8 @@
 #define queryStudentName       @"Inquiry_Student"
 #define modifyPhoneNumName     @"Update_PhoneNum"
 #define modifyPasswordName     @"Update_PWD"
+#define insertOrderName        @"Insert_Order_RoomID"
+#define queryVersionName       @"Inquiry_Version"
 
 
 
@@ -147,6 +150,24 @@
     return isSuccess;
 }
 
+// 插入控制命令 01 返回0/1
++ (NSString *)insertOrderWithUserID:(NSString *)userID roomID:(NSString *)roomID accountType:(NSString *)accountType orderID:(NSString *)orderID{
+    WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
+    NSString *realOrder;
+    if (orderID.boolValue) { // 2 表示打开 3表示关闭 0转成3 1转成2
+        realOrder = @"2";
+    } else {
+        realOrder = @"3";
+    }
+    NSString *isSuccess = [sharedService insertOrderWithUserID:userID roomID:roomID accountType:accountType orderID:realOrder];
+    return isSuccess;
+}
+// 检查版本 iOS 返回dictionary
++ (NSDictionary *)queryVersionWithType:(NSString *)type{
+    WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
+    NSDictionary *versionDic = [sharedService queryVersionWithType:type];
+    return versionDic;
+}
 
 ///////////////////////
 #pragma mark - 成员 方法
@@ -160,8 +181,8 @@
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:logInMethodName soapMessage:arrMsg];
     //  NSLog(@"rootChilds is %@",rootChilds);
-    if (!rootChilds) { // 如果为空 失败返回0
-        return @"0";
+    if (!rootChilds) { // 如果为空 失败返回1000
+        return loginRequestError;
     }
     NSString *userLimitNumber = [self convertLogDataFromArray:rootChilds];
     NSLog(@"=======同步请求结束======\n");
@@ -194,14 +215,10 @@
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryUserInfoName soapMessage:arrMsg];
     //    NSLog(@"rootChilds is %@",rootChilds);
-
-    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
     if (!rootChilds) { // 如果为空
-        NSLog(@"userindo nil");
-        //   userInfo = @"0";  // 返回没有控制权限
-    } else {
-        userInfo = (NSMutableDictionary *)[self convertUserInfoDataFromArray:rootChilds];
+        return rootChilds;
     }
+    NSMutableDictionary *userInfo = (NSMutableDictionary *)[self convertUserInfoDataFromArray:rootChilds];
     //    NSLog(@"result is %@",userInfo);
     NSLog(@"=======同步请求结束======\n");
     return (NSDictionary *)userInfo;
@@ -215,12 +232,10 @@
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryChannelStatName soapMessage:arrMsg];
     //NSLog(@"rootChilds is %@",rootChilds);
-    NSMutableDictionary *channelState = [[NSMutableDictionary alloc] init];
     if (!rootChilds) { // 如果为空
-        // do sth
-    } else {
-        channelState = (NSMutableDictionary *)[self convertChanelStatDataFromArray:rootChilds];
+        return rootChilds;
     }
+    NSMutableDictionary *channelState = (NSMutableDictionary *)[self convertChanelStatDataFromArray:rootChilds];
     //NSLog(@"result is %@",channelState);
     NSLog(@"=======同步请求结束======\n");
     return channelState;
@@ -234,12 +249,10 @@
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryRoomName soapMessage:arrMsg];
     //   NSLog(@"rootChilds is %@",rootChilds);
-    NSMutableArray *studentArr = [[NSMutableArray alloc] init];
     if (!rootChilds) { // 如果为空
-        //     do sth
-    } else {
-        studentArr = (NSMutableArray *)[self convertRoomDataFromArray:rootChilds];
+        return rootChilds;
     }
+    NSMutableArray *studentArr = (NSMutableArray *)[self convertRoomDataFromArray:rootChilds];
     //NSLog(@"result is %@",studentArr);
     NSLog(@"=======同步请求结束======\n");
     return studentArr;
@@ -253,14 +266,11 @@
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:startTime,@"StartTime", nil]];
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:endTime,@"EndTime", nil]];
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryRechargeName soapMessage:arrMsg];
-    
     //    NSLog(@"rootChilds is %@",rootChilds);
-    NSMutableArray *rechargeArr = [[NSMutableArray alloc] init];
     if (!rootChilds) { // 如果为空
-        // do sth
-    } else {
-        rechargeArr = (NSMutableArray *)[self convertRechargeDataFromArray:rootChilds];
+        return rootChilds;
     }
+    NSMutableArray *rechargeArr = (NSMutableArray *)[self convertRechargeDataFromArray:rootChilds];
     //    NSLog(@"result is %@",rechargeArr);
     NSLog(@"=======同步请求结束======\n");
     return rechargeArr;
@@ -271,13 +281,13 @@
     NSMutableArray *arrMsg=[NSMutableArray array];
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryBuildingName soapMessage:arrMsg];
-    //   NSLog(@"rootChilds is %@",rootChilds);
+//       NSLog(@"rootChilds is %@ hahahis:%@",rootChilds,hahah);
     if (!rootChilds) { // 如果为空
         return rootChilds;
     }
-    
     NSArray *roomArray = [self convertBuildingDataFromArray:rootChilds];
     NSLog(@"=======同步请求结束======\n");
+    
     return roomArray;
 }
 // 查询宿舍历史用电信息
@@ -292,7 +302,7 @@
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:freq,@"Freq", nil]];
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryHisDataName soapMessage:arrMsg];
-       NSLog(@"rootChilds is %@",rootChilds);
+//       NSLog(@"rootChilds is %@",rootChilds);
     if (!rootChilds) { // 如果为空
         return rootChilds;
     }
@@ -383,6 +393,8 @@
     NSMutableArray *arrMsg=[NSMutableArray array];
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryStudentName soapMessage:arrMsg];
+//               NSLog(@"rootChilds is %@",rootChilds);
+
     if (!rootChilds) { // 如果为空
         return rootChilds;
     }
@@ -408,7 +420,6 @@
     NSLog(@"=======同步请求结束======\n");
     return isSuccess;
 }
-
 // 修改密码 返回0/1
 - (NSString *)modifyPasswordWithUserID:(NSString *)userID oldPassword:(NSString *)oldPassword modifyPassword:(NSString *)modifyPassword role:(NSString *)role{
     NSLog(@"=======同步请求开始 修改密码======\n");
@@ -427,6 +438,42 @@
     NSString *isSuccess = [self convertModifyPasswordDataFromArray:rootChilds];
     NSLog(@"=======同步请求结束======\n");
     return isSuccess;
+}
+// 插入控制命令 01 返回0/1
+- (NSString *)insertOrderWithUserID:(NSString *)userID roomID:(NSString *)roomID accountType:(NSString *)accountType orderID:(NSString *)orderID{
+    NSLog(@"=======同步请求开始 插入控制命令======\n");
+    NSMutableArray *arrMsg=[NSMutableArray array];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:roomID,@"RoomID", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:accountType,@"AccountType", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:orderID,@"OrderID", nil]];
+    
+    NSArray *rootChilds = [self getWebServiceWithMethodName:insertOrderName soapMessage:arrMsg];
+    //  NSLog(@"rootChilds is %@",rootChilds);
+    if (!rootChilds) { // 如果为空 失败返回0
+        return @"0";
+    }
+    NSString *isSuccess = [self convertInsertOrderDataFromArray:rootChilds];
+    NSLog(@"=======同步请求结束======\n");
+    return isSuccess;
+}
+
+// 检查版本 iOS 返回dictionary
+- (NSDictionary *)queryVersionWithType:(NSString *)type{
+    NSLog(@"=======同步请求开始 检查现在版本======\n");
+    NSMutableArray *arrMsg=[NSMutableArray array];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:type,@"Type", nil]];
+    
+    NSArray *rootChilds = [self getWebServiceWithMethodName:queryVersionName soapMessage:arrMsg];
+    NSMutableDictionary *version = [[NSMutableDictionary alloc] init];
+    //    NSLog(@"rootChilds is %@",rootChilds);
+    if (!rootChilds) { // 如果为空
+        // do sth
+    }else {
+        version = (NSMutableDictionary *)[self convertVersionDataFromArray:rootChilds];
+    }
+    NSLog(@"=======同步请求结束======\n");
+    return version;
 }
 
 /**
@@ -740,7 +787,37 @@
     NSString *retunNumber = [dataDic objectForKey:baseName];
     return retunNumber;
 }
+// 插入控制命令 01 返回0/1
+- (NSString *)convertInsertOrderDataFromArray:(NSArray *)rootchilds
+{
+    NSMutableDictionary *dataDic= [rootchilds objectAtIndex:0];
+    NSString *retunNumber = [dataDic objectForKey:baseName];
+    return retunNumber;
+}
 
+// 检查版本 iOS 返回dictionary
+- (NSDictionary *)convertVersionDataFromArray:(NSArray *)rootchilds{
+    NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
+    if ([[[dataDic allValues] objectAtIndex:0] isKindOfClass:[NSString class]]) { // 返回的数组为空值 则该处为 字符串类型 判断出来 返回空数组
+        return nil;
+    }
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    
+    NSMutableDictionary *version = [[NSMutableDictionary alloc] init];
+    NSArray *versionKeys = [dataDic allKeys];
+    for (NSString *aKey in versionKeys) {
+        if ([[dataDic objectForKey:aKey] isKindOfClass:[NSArray class]]) { // 如果属性不为空
+            NSString *aContent = [[[dataDic objectForKey:aKey] objectAtIndex:0] objectForKey:baseName];
+            [version setObject:aContent forKey:aKey];
+        } else {
+            [version setObject:@"" forKey:aKey];
+        }
+    }
+    return (NSDictionary *)version;
+    
+}
 /**
  * 通过WebService传递方法名和参数向公司网站请求数据
  **/

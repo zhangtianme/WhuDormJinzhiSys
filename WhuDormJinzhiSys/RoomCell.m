@@ -14,6 +14,14 @@
 - (void)awakeFromNib {
     // Initialization code
 }
+- (id)init {
+    self = [super init];
+    if (self) {
+        // Initialization code
+        [self setup];
+    }
+    return self;
+}
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -42,11 +50,19 @@
     }
     return self;
 }
-- (void)setFrame:(CGRect)frame {
-//        NSLog(@"set frame frame:%@",NSStringFromCGRect(frame));
-    [super setFrame:frame];
+/**
+ *  一个神奇的方法
+ */
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    NSLog(@"loyout subviews;");
     [self setup];
 }
+//- (void)setFrame:(CGRect)frame {
+////        NSLog(@"set frame frame:%@",NSStringFromCGRect(frame));
+//    [super setFrame:frame];
+////    [self setup];
+//}
 //CGRect headBackgroundImageRect = CGRectMake(0*widthZoom, 0*heightZoom, 320*widthZoom, 44*heightZoom);
 
 - (void)setup {
@@ -70,7 +86,7 @@
     CGFloat nameLabelTextSize         = 17.0f;
     CGFloat lightStatusLabelTextSize  = 14.0f;
     CGFloat airConStatusLabelTextSize = 14.0f;
-    
+
     // icon imageview
     if (!_iconImageView) { // 如果空
 //        NSLog(@"icon image nil");
@@ -114,25 +130,27 @@
     
     // lightning State Switch 照明开关状态
     if (!_lightningStateSwitch) { // 如果空
-        _lightningStateSwitch = [[UISwitch alloc] init];
+        _lightningStateSwitch = [[UISwitch alloc] initWithFrame:lightStateSwitchFrame];
         _lightningStateSwitch.onTintColor = mainBlueColor;
         [self addSubview:_lightningStateSwitch];
     }
     [_lightningStateSwitch setFrame:lightStateSwitchFrame];
+
     
     // airCon State Switch 空调开关状态
     if (!_airConStateSwitch) { // 如果空
-        _airConStateSwitch = [[UISwitch alloc] init];
+        _airConStateSwitch = [[UISwitch alloc] initWithFrame:airConStateSwitchFrame];
         _airConStateSwitch.onTintColor = mainBlueColor;
         [self addSubview:_airConStateSwitch];
     }
     [_airConStateSwitch setFrame:airConStateSwitchFrame];
-}
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
 }
+//
+//- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+//    [super setSelected:selected animated:animated];
+//    NSLog(@"set selected");
+//    // Configure the view for the selected state
+//}
 
 @end

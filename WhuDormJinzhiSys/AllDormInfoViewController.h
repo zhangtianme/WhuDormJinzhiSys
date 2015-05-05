@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 #import "DropDownChooseProtocol.h"
 
-@interface AllDormInfoViewController : UIViewController<UIScrollViewDelegate,DropDownChooseDataSource,DropDownChooseDelegate,UITableViewDelegate,UITableViewDataSource>
+@interface AllDormInfoViewController : UIViewController<UIScrollViewDelegate,DropDownChooseDataSource,DropDownChooseDelegate,UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate,UISearchDisplayDelegate>
 
 @end

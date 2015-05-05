@@ -42,12 +42,6 @@
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.shadowImage = [[UIImage alloc] init];
     
-    if (!mbHud) {  // 初始化指示器
-        mbHud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
-        [self.navigationController.view addSubview:mbHud];
-        mbHud.dimBackground = YES;
-    }
-    
     // 初始化
     CGFloat widthZoom = self.view.frame.size.width/320;// 缩放比例
     CGFloat heightZoom = self.view.frame.size.height/568;
@@ -134,16 +128,22 @@
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if (!mbHud) {  // 初始化指示器
+        mbHud = [[MBProgressHUD alloc] initWithView:self.navigationController.view];
+        [self.navigationController.view addSubview:mbHud];
+        mbHud.dimBackground = YES;
+    }
     if(dayHisData == nil) { // 如果为空则重新请求数据
         NSLog(@"hah nil");
         [self queryDataAndShowHud]; // 请求数据
-        
     }
 }
 
 - (void)queryDataAndShowHud {
-    [mbHud showWithTitle:@"Loading..." detail:nil];
+    [mbHud showWithTitle:@"数据加载中..." detail:nil];
     [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
     // 异步线程调用接口
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
@@ -151,8 +151,8 @@
         [self queryHisData];
         // 返回主线程 处理结果
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [mbHud hide:YES];
-
+            [mbHud showWithTitle:@"数据加载成功!" detail:nil];
+            [mbHud hide:YES afterDelay:0.5];
             [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
             // 更新界面
             [self updateInterface];

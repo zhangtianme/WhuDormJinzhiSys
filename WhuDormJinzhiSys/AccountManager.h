@@ -28,6 +28,20 @@
  */
 @property (assign)BOOL isLogin;
 
+/**
+ *  从哪个软件唤醒
+ */
+@property (nonatomic, strong)NSString *wakeUpAppBundle;
+/**
+ *  房间搜索历史
+ */
+@property (nonatomic, strong)NSArray *roomSearchHis;
+
+/**
+ *  学生搜索历史
+ */
+@property (nonatomic, strong)NSArray *studentSearchHis;
+
 
 
 /**
@@ -37,6 +51,20 @@
  */
 + (AccountManager *)sharedAccountManager;
 
+/**
+ *  <#Description#>
+ *
+ *  @param object <#object description#>
+ *  @param index  <#index description#>
+ */
+- (void)insertObject:(NSDictionary *)object inRoomSearchHisAtIndex:(NSUInteger)index;
+/**
+ *  <#Description#>
+ *
+ *  @param object <#object description#>
+ *  @param index  <#index description#>
+ */
+- (void)insertObject:(NSDictionary *)object inStudentSearchHisAtIndex:(NSUInteger)index;
 
 /**
  *  用户登录
@@ -44,9 +72,9 @@
  *  @param userID   用户ID
  *  @param password 用户密码
  *
- *  @return bool 是否登陆成功
+ *  @return NSString 登陆后的角色号
  */
-- (BOOL)logInWithUserID:(NSString *)userID password:(NSString *)password;
+- (NSString *)logInWithUserID:(NSString *)userID password:(NSString *)password;
 /**
  *  修改密码
  *

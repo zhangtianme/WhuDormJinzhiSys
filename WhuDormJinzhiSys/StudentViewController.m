@@ -40,7 +40,7 @@
         //    controlLimitLabel.text = [student valueForKey:isPermissionName];
         roomDetailLabel.text = roomDetail;
     } else {
-        [mbHud showWithTitle:@"Loading..." detail:nil];
+        [mbHud showWithTitle:@"数据加载中..." detail:nil];
         [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
         __block NSDictionary *userInfo = [[NSDictionary alloc] init]; //
         // 异步线程调用接口
@@ -52,8 +52,8 @@
             [self getDataFromUserInfo:userInfo];
             // 返回主线程 处理结果
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [mbHud hide:YES];
-                [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
+                [mbHud showWithTitle:@"数据加载成功!" detail:nil];
+                [mbHud hide:YES afterDelay:0.5];                [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
                 [self updateInterface];
             });
         });

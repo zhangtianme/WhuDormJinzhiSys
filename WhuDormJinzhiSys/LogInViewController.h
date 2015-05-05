@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface LogInViewController : UIViewController
+//
+//@property (strong, nonatomic) NSString *accountName; // 从外面传进来的账号
 
 @property (strong, nonatomic) UITextField *accountTextField; // 账号
 @property (strong, nonatomic) UITextField *passwordTextField;// 密码
@@ -18,4 +20,8 @@
 
 @property (strong, nonatomic) UIImageView *buttomIconImage;  // 底部图标
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+
+
+- (void)updateInterface; // 更新界面
+
 @end

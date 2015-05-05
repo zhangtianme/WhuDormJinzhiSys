@@ -598,13 +598,13 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jgy-VQ-C58" id="cN3-dk-jM0">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="C8i-AA-MGI">
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="C8i-AA-MGI">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                 </textField>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RL1-H9-PMd">
-                                                    <rect key="frame" x="0.0" y="-6" width="320" height="55"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="21"/>
                                                     <state key="normal" title="确认修改">
                                                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -613,13 +613,14 @@
                                             </subviews>
                                             <color key="backgroundColor" red="0.83137255909999996" green="0.90588235859999999" blue="0.95686274770000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
-                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="centerY" secondItem="cN3-dk-jM0" secondAttribute="centerY" id="6yd-3q-Ou1"/>
-                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="leading" secondItem="C8i-AA-MGI" secondAttribute="leading" id="Deh-PE-bdS"/>
-                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="top" secondItem="cN3-dk-jM0" secondAttribute="topMargin" constant="-14" id="Eri-1A-gJp"/>
-                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="centerY" secondItem="C8i-AA-MGI" secondAttribute="centerY" id="LPe-5U-aAR"/>
-                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="leading" secondItem="cN3-dk-jM0" secondAttribute="leading" id="Myo-IS-nDv"/>
-                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="trailing" secondItem="C8i-AA-MGI" secondAttribute="trailing" id="aa4-eU-7oN"/>
-                                                <constraint firstAttribute="trailing" secondItem="RL1-H9-PMd" secondAttribute="trailing" id="hRT-Ib-10I"/>
+                                                <constraint firstItem="C8i-AA-MGI" firstAttribute="top" secondItem="cN3-dk-jM0" secondAttribute="top" id="IaJ-hB-zeX"/>
+                                                <constraint firstItem="C8i-AA-MGI" firstAttribute="leading" secondItem="cN3-dk-jM0" secondAttribute="leading" id="NHu-YN-BJr"/>
+                                                <constraint firstAttribute="bottom" secondItem="C8i-AA-MGI" secondAttribute="bottom" id="RkJ-NS-UM2"/>
+                                                <constraint firstAttribute="trailing" secondItem="RL1-H9-PMd" secondAttribute="trailing" id="gW0-wQ-h9V"/>
+                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="top" secondItem="C8i-AA-MGI" secondAttribute="top" id="ltI-cK-KgS"/>
+                                                <constraint firstItem="RL1-H9-PMd" firstAttribute="bottom" secondItem="C8i-AA-MGI" secondAttribute="bottom" id="nzH-EX-TaV"/>
+                                                <constraint firstItem="C8i-AA-MGI" firstAttribute="trailing" secondItem="RL1-H9-PMd" secondAttribute="trailing" id="tXj-It-79x"/>
+                                                <constraint firstItem="C8i-AA-MGI" firstAttribute="leading" secondItem="RL1-H9-PMd" secondAttribute="leading" id="tcq-Oc-VPv"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -728,6 +729,30 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection id="E9u-Tc-2Xf">
+                                <cells>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="3us-Gj-fJW" detailTextLabel="qyb-8i-Wvw" style="IBUITableViewCellStyleValue1" id="DsA-ZL-x77">
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="DsA-ZL-x77" id="yW7-qY-nzR">
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="版本更新" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="3us-Gj-fJW">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="点击检查版本更新" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="qyb-8i-Wvw">
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection id="M2j-TL-Eee">
                                 <cells>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="MGD-vr-2i2" style="IBUITableViewCellStyleDefault" id="0FC-g8-5bQ">
@@ -813,7 +838,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QL9-d4-bTH" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="349" y="2018"/>
+            <point key="canvasLocation" x="347" y="1932"/>
         </scene>
         <!--Tally Book View Controller-->
         <scene sceneID="xnY-cl-cus">
@@ -1595,13 +1620,13 @@
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="3Xq-sv-pPk" id="hzX-PD-1BX">
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="gmC-ml-wuU">
+                                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="gmC-ml-wuU">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                 </textField>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="11N-LD-Neh">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="21"/>
                                                     <state key="normal" title="确认修改">
                                                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -1611,13 +1636,14 @@
                                             </subviews>
                                             <color key="backgroundColor" red="0.83137255909999996" green="0.90588235859999999" blue="0.95686274770000002" alpha="1" colorSpace="calibratedRGB"/>
                                             <constraints>
-                                                <constraint firstItem="11N-LD-Neh" firstAttribute="leading" secondItem="gmC-ml-wuU" secondAttribute="leading" id="4by-4W-6Pk"/>
-                                                <constraint firstAttribute="trailing" secondItem="11N-LD-Neh" secondAttribute="trailing" id="Gql-EO-Huh"/>
-                                                <constraint firstItem="11N-LD-Neh" firstAttribute="top" secondItem="hzX-PD-1BX" secondAttribute="top" id="SmZ-6G-7ZE"/>
-                                                <constraint firstItem="11N-LD-Neh" firstAttribute="leading" secondItem="hzX-PD-1BX" secondAttribute="leading" id="WZL-eY-Et1"/>
-                                                <constraint firstItem="11N-LD-Neh" firstAttribute="top" secondItem="gmC-ml-wuU" secondAttribute="top" id="cch-0O-op7"/>
-                                                <constraint firstAttribute="bottomMargin" secondItem="11N-LD-Neh" secondAttribute="bottom" constant="-9" id="dgL-SU-H1h"/>
-                                                <constraint firstItem="11N-LD-Neh" firstAttribute="trailing" secondItem="gmC-ml-wuU" secondAttribute="trailing" id="lbY-fJ-Eb4"/>
+                                                <constraint firstItem="11N-LD-Neh" firstAttribute="top" secondItem="hzX-PD-1BX" secondAttribute="top" id="GFt-AX-XWy"/>
+                                                <constraint firstItem="11N-LD-Neh" firstAttribute="trailing" secondItem="gmC-ml-wuU" secondAttribute="trailing" id="RB6-SO-tp8"/>
+                                                <constraint firstItem="11N-LD-Neh" firstAttribute="top" secondItem="gmC-ml-wuU" secondAttribute="top" id="Smx-jv-z1J"/>
+                                                <constraint firstItem="11N-LD-Neh" firstAttribute="leading" secondItem="gmC-ml-wuU" secondAttribute="leading" id="fxJ-4K-z1t"/>
+                                                <constraint firstItem="11N-LD-Neh" firstAttribute="bottom" secondItem="gmC-ml-wuU" secondAttribute="bottom" id="gO9-pc-OtB"/>
+                                                <constraint firstAttribute="trailing" secondItem="11N-LD-Neh" secondAttribute="trailing" id="jb0-I3-JuH"/>
+                                                <constraint firstAttribute="bottom" secondItem="11N-LD-Neh" secondAttribute="bottom" id="qlC-FM-EjA"/>
+                                                <constraint firstItem="11N-LD-Neh" firstAttribute="leading" secondItem="hzX-PD-1BX" secondAttribute="leading" id="vo0-gq-4yo"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -1661,10 +1687,10 @@
         <image name="whuLogoWhiteRe.png" width="600" height="600"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="5kz-SV-G8g"/>
-        <segue reference="fUr-Yz-CZY"/>
-        <segue reference="XLS-T8-HFV"/>
-        <segue reference="yhx-H7-g7E"/>
-        <segue reference="7Kz-Zh-hK0"/>
+        <segue reference="aVG-dg-HTz"/>
+        <segue reference="2HH-eb-lqO"/>
+        <segue reference="0Ee-Tj-bQr"/>
+        <segue reference="i5q-CA-BjM"/>
+        <segue reference="tNc-gN-Iti"/>
     </inferredMetricsTieBreakers>
 </document>

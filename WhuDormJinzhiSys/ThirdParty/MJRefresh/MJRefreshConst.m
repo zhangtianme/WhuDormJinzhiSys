@@ -25,7 +25,7 @@ NSString *const MJRefreshHeaderTimeKey = @"MJRefreshHeaderView";
 NSString *const MJRefreshContentOffset = @"contentOffset";
 NSString *const MJRefreshContentSize = @"contentSize";
 */
-
+#import <UIKit/UIKit.h>
 
 // 为自己修改过
 const CGFloat MJRefreshViewHeight = 44.0;

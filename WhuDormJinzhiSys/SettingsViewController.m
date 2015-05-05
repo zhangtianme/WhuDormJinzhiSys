@@ -8,10 +8,11 @@
 
 #import "SettingsViewController.h"
 #import "MacroDefinition.h"
-#define modifyPhoneSection    1// 修改手机号所在的行
-#define modifyPasswordSection 2// 修改密码所在的行
-#define aboutSection          3// 关于所在的行
-#define logoutSection         4// 退出登陆所在的行
+#define modifyPhoneSection    1// 修改手机号所在行
+#define modifyPasswordSection 2// 修改密码所在行
+#define aboutSection          3// 关于所在行
+#define versionUpdateSection  4// 版本更新所在行
+#define logoutSection         5// 退出登陆所在行
 
 @interface SettingsViewController () {
     AccountManager *accountManager;
@@ -25,6 +26,7 @@
     [super viewDidLoad];
     accountManager = [AccountManager sharedAccountManager];
     self.tableView.backgroundColor = lightBlueColor;
+    self.navigationItem.title = @"设置";
     _userIDLabel.text = accountManager.userID;
     
     // Uncomment the following line to preserve selection between presentations.
@@ -66,6 +68,32 @@
         case aboutSection:{//关于
             [self performSegueWithIdentifier:showAboutIdentifier sender:self];
 
+        }break;
+        case versionUpdateSection:{//版本更新
+            NSDictionary *version = [WhuControlWebservice queryVersionWithType:iOSTypeName];
+            NSLog(@"version is:%@",version);
+            NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+            double doubleCurrentVersion = [[infoDictionary objectForKey:@"CFBundleShortVersionString"] doubleValue];
+            double doubleUpdateVersion;
+            NSArray *allKeys = [version allKeys];
+            if ([allKeys containsObject:versionNameName]) {
+                doubleUpdateVersion = [[version valueForKey:versionNameName] doubleValue];
+            }
+            if (doubleCurrentVersion<doubleUpdateVersion) { // 需要版本更新
+                NSLog(@"need upadteversion");
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"发现新版本是否需要升级?" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                [alertController addAction:[UIAlertAction actionWithTitle:@"升级" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {// 升级
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[version valueForKey:urlName]]];
+                }]];
+                [alertController addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alertController animated:YES completion:nil];
+            } else { // 不需要更新
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"暂无新版本" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alertController animated:YES completion:nil];
+                
+            }
+            
         }break;
         case logoutSection:{//退出登录
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"确定退出登录?" message:nil preferredStyle:UIAlertControllerStyleAlert];

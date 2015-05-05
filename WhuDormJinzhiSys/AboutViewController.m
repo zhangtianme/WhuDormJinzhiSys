@@ -27,10 +27,9 @@
     NSString *version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
     NSString *build = [infoDictionary objectForKey:@"CFBundleVersion"];
 
-    NSLog(@"veision:%@ build:%@ name:%@",version,build,name);
-
-    _nameLabel.text = [NSString stringWithFormat:@"武大宿舍用电V%@",version];
-    
+     double doubleversion = version.doubleValue;
+    NSLog(@"veision:%@ build:%@ name:%@ doubleversion:%f",version,build,name,doubleversion);
+    _nameLabel.text = [NSString stringWithFormat:@"武大宿舍用电V%@(%@)",version,build];
     
 }
 

@@ -184,6 +184,8 @@
             
             // 回调
             if ([self.beginRefreshingTaget respondsToSelector:self.beginRefreshingAction]) {
+//                objc_msgSend()
+                
                 objc_msgSend(self.beginRefreshingTaget, self.beginRefreshingAction, self);
             }
             

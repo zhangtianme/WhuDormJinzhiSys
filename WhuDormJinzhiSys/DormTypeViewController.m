@@ -160,7 +160,7 @@
     }
     roomDetailsLabel.text = roomDetails;
     
-    for (int i = 0; i < manager.students.count; i++) {
+    for (int i = 0; i < (manager.students.count>4?4:manager.students.count); i++) {
         ((UILabel *)studentNames[i]).text = [manager.students[i] valueForKey:stuNameName];
         ((UILabel *)studentFacultys[i]).text = [manager.students[i] valueForKey:facultyName];
     }
