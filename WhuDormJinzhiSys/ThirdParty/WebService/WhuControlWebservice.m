@@ -30,6 +30,10 @@
 #define modifyPasswordName     @"Update_PWD"
 #define insertOrderName        @"Insert_Order_RoomID"
 #define queryVersionName       @"Inquiry_Version"
+#define queryCurrentThreePhaseName   @"Inquiry_Threephase_R"
+#define queryHisThreePhaseName       @"Inquiry_Threephase_H"
+
+
 
 
 
@@ -169,6 +173,22 @@
     return versionDic;
 }
 
+// 查询某栋宿舍的三相电表的当前状态
++ (NSDictionary *)queryCurrentThreePhaseStateWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit accountType:(NSString *)accountType{
+
+    WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
+    NSDictionary *currentThreePhaseDic = [sharedService queryCurrentThreePhaseStateWithArea:area building:building unit:unit accountType:accountType];
+    return currentThreePhaseDic;
+}
+
+// 查询某栋宿舍的三相电表的历史状态
++ (NSArray *)queryHisThreePhaseStateWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit accountType:(NSString *)accountType field:(NSString *)field startTime:(NSString *)startTime endTime:(NSString *)endTime freq:(NSString *)freq{
+    WhuControlWebservice *sharedService = [WhuControlWebservice sharedService];
+    NSArray *hisThreePhaseDic = [sharedService queryHisThreePhaseStateWithArea:area building:building unit:unit accountType:accountType field:field startTime:startTime endTime:endTime freq:freq];
+    return hisThreePhaseDic;
+}
+
+
 ///////////////////////
 #pragma mark - 成员 方法
 - (NSString *)logInWithID:(NSString *)userID password:(NSString *)password
@@ -215,11 +235,12 @@
     [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:userID,@"UserID", nil]];
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryUserInfoName soapMessage:arrMsg];
     //    NSLog(@"rootChilds is %@",rootChilds);
+    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] init];
     if (!rootChilds) { // 如果为空
-        return rootChilds;
+        // do sth
+    } else {
+       userInfo = (NSMutableDictionary *)[self convertUserInfoDataFromArray:rootChilds];
     }
-    NSMutableDictionary *userInfo = (NSMutableDictionary *)[self convertUserInfoDataFromArray:rootChilds];
-    //    NSLog(@"result is %@",userInfo);
     NSLog(@"=======同步请求结束======\n");
     return (NSDictionary *)userInfo;
 }
@@ -232,11 +253,12 @@
     
     NSArray *rootChilds = [self getWebServiceWithMethodName:queryChannelStatName soapMessage:arrMsg];
     //NSLog(@"rootChilds is %@",rootChilds);
+    NSMutableDictionary *channelState = [[NSMutableDictionary alloc] init];
     if (!rootChilds) { // 如果为空
-        return rootChilds;
+        // do sth
+    } else {
+        channelState = (NSMutableDictionary *)[self convertChanelStatDataFromArray:rootChilds];
     }
-    NSMutableDictionary *channelState = (NSMutableDictionary *)[self convertChanelStatDataFromArray:rootChilds];
-    //NSLog(@"result is %@",channelState);
     NSLog(@"=======同步请求结束======\n");
     return channelState;
 }
@@ -457,7 +479,6 @@
     NSLog(@"=======同步请求结束======\n");
     return isSuccess;
 }
-
 // 检查版本 iOS 返回dictionary
 - (NSDictionary *)queryVersionWithType:(NSString *)type{
     NSLog(@"=======同步请求开始 检查现在版本======\n");
@@ -474,6 +495,51 @@
     }
     NSLog(@"=======同步请求结束======\n");
     return version;
+}
+
+// 查询某栋宿舍的三相电表的当前状态
+- (NSDictionary *)queryCurrentThreePhaseStateWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit accountType:(NSString *)accountType{
+    NSLog(@"=======同步请求开始 查询某栋宿舍的三相电表的当前状态======\n");
+    NSMutableArray *arrMsg=[NSMutableArray array];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:area,@"Area", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:building,@"Building", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:unit,@"Unit", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:accountType,@"AccountType", nil]];
+
+    NSArray *rootChilds = [self getWebServiceWithMethodName:queryCurrentThreePhaseName soapMessage:arrMsg];
+    NSMutableDictionary *currentThreePhase = [[NSMutableDictionary alloc] init];
+    //    NSLog(@"rootChilds is %@",rootChilds);
+    if (!rootChilds) { // 如果为空
+        // do sth
+    }else {
+        currentThreePhase = (NSMutableDictionary *)[self convertCurrentThreePhaseDataFromArray:rootChilds];
+    }
+    NSLog(@"=======同步请求结束======\n");
+    return currentThreePhase;
+}
+
+// 查询某栋宿舍的三相电表的历史状态
+- (NSArray *)queryHisThreePhaseStateWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit accountType:(NSString *)accountType field:(NSString *)field startTime:(NSString *)startTime endTime:(NSString *)endTime freq:(NSString *)freq{
+    NSLog(@"=======同步请求开始 查询某栋宿舍的三相电表的历史状态======\n");
+    NSMutableArray *arrMsg=[NSMutableArray array];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:area,@"Area", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:building,@"Building", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:unit,@"Unit", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:accountType,@"AccountType", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:field,@"Field", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:freq,@"Freq", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:startTime,@"StartTime", nil]];
+    [arrMsg addObject:[NSDictionary dictionaryWithObjectsAndKeys:endTime,@"EndTime", nil]];
+    
+    NSArray *rootChilds = [self getWebServiceWithMethodName:queryHisThreePhaseName soapMessage:arrMsg];
+    //           NSLog(@"rootChilds is %@",rootChilds);
+    if (!rootChilds) { // 如果为空
+        return rootChilds;
+    }
+    
+    NSArray *hisThreePhaseArray = [self convertChargeBackDataFromArray:rootChilds];
+    NSLog(@"=======同步请求结束======\n");
+    return hisThreePhaseArray;
 }
 
 /**
@@ -720,7 +786,6 @@
     return (NSDictionary *)channelState;
     
 }
-
 // 查询某栋宿舍的房间详细信息
 - (NSArray *)convertBuildingDetailDataFromArray:(NSArray *)rootchilds{
     NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
@@ -794,7 +859,6 @@
     NSString *retunNumber = [dataDic objectForKey:baseName];
     return retunNumber;
 }
-
 // 检查版本 iOS 返回dictionary
 - (NSDictionary *)convertVersionDataFromArray:(NSArray *)rootchilds{
     NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
@@ -816,7 +880,56 @@
         }
     }
     return (NSDictionary *)version;
+}
+
+// 查询某栋宿舍的三相电表的当前状态
+- (NSDictionary *)convertCurrentThreePhaseDataFromArray:(NSArray *)rootchilds{
+    NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
+    if ([[[dataDic allValues] objectAtIndex:0] isKindOfClass:[NSString class]]) { // 返回的数组为空值 则该处为 字符串类型 判断出来 返回空数组
+        return nil;
+    }
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
     
+    NSMutableDictionary *currentThreePhaseState = [[NSMutableDictionary alloc] init];
+    NSArray *channelStateKeys = [dataDic allKeys];
+    for (NSString *aKey in channelStateKeys) {
+        if ([[dataDic objectForKey:aKey] isKindOfClass:[NSArray class]]) { // 如果属性不为空
+            NSString *aContent = [[[dataDic objectForKey:aKey] objectAtIndex:0] objectForKey:baseName];
+            [currentThreePhaseState setObject:aContent forKey:aKey];
+        } else {
+            [currentThreePhaseState setObject:@"" forKey:aKey];
+        }
+    }
+    return (NSDictionary *)currentThreePhaseState;
+    
+}
+// 查询某栋宿舍的三相电表的历史状态
+- (NSArray *)convertHisThreePhaseDataFromArray:(NSArray *)rootchilds{
+    NSMutableDictionary *dataDic= [rootchilds objectAtIndex:1];
+    if ([[[dataDic allValues] objectAtIndex:0] isKindOfClass:[NSString class]]) { // 返回的数组为空值 则该处为 字符串类型 判断出来 返回空数组
+        return nil;
+    }
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    dataDic = [[[dataDic allValues] objectAtIndex:0] objectAtIndex:0];
+    
+    NSMutableArray *hisThreePhaseDatas = [[NSMutableArray alloc] init];
+    for (NSArray *aArr in [dataDic allValues]) {
+        NSDictionary *aDic = [aArr objectAtIndex:0];
+        NSMutableDictionary *aHisData = [[NSMutableDictionary alloc] init];
+        NSArray *roomKeys = [aDic allKeys];
+        for (NSString *aKey in roomKeys) {
+            if ([[aDic objectForKey:aKey] isKindOfClass:[NSArray class]]) { // 如果属性不为空
+                NSString *aContent = [[[aDic objectForKey:aKey] objectAtIndex:0] objectForKey:baseName];
+                [aHisData setObject:aContent forKey:aKey];
+            } else {
+                [aHisData setObject:@"" forKey:aKey];
+            }
+        }
+        [hisThreePhaseDatas addObject:aHisData];
+    }
+    return (NSArray *)hisThreePhaseDatas;
 }
 /**
  * 通过WebService传递方法名和参数向公司网站请求数据

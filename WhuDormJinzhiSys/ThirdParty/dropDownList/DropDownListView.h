@@ -34,7 +34,11 @@
 - (void)setTitleColorNormal:(UIColor *)titleColorNormal;
 - (void)setTitleColorSelected:(UIColor *)titleColorSelected;
 
-- (void)reloadData;
+-(void)backGroundTappedAction; // 点击背景
+
+//- (void)chooseSection:(NSInteger)section;  // 模拟点击
+
+//- (void)reloadData;  还未完整
 
 - (void)reloadTitle;
 

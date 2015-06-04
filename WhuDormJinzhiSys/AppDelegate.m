@@ -58,33 +58,42 @@
     }
 
     [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:80]; // 距离，是否能调到中间位置
-    sleep(1);  //
     
     return YES;
 }
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    [[UINavigationBar appearance] setBarTintColor:mainBlueColor]; // 不适用半透明的话是原色
-    [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, nil]]; // 导航栏标题颜色
-    [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]]; // 导航栏各种按钮颜色
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent]; // 导航栏亮色 需要配合plist viewcontroller 某项属性设置为NO
+//    [[UINavigationBar appearance] setBarTintColor:mainBlueColor]; // 不适用半透明的话是原色
+//    [[UINavigationBar appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor whiteColor], NSForegroundColorAttributeName, nil]]; // 导航栏标题颜色
+//    [[UINavigationBar appearance] setTintColor:[UIColor whiteColor]]; // 导航栏各种按钮颜色
+//    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent]; // 导航栏亮色 需要配合plist viewcontroller 某项属性设置为NO
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UINavigationController *navController = (UINavigationController *)self.window.rootViewController;
     navController.navigationBar.translucent = NO; // 设置为非透明
     
     NSLog(@"Calling Application Bundle ID: %@", sourceApplication);
+    NSLog(@"urlis :%@",url);
     NSLog(@"URL scheme:%@", [url scheme]);
     NSLog(@"URL query: %@", [url query]);
     NSDictionary *dicQuery;
     if ([url query]) { // not nil
-        NSData *nsdataFromBase64String = [[NSData alloc] initWithBase64EncodedString:[url query] options:0];
+        NSData *nsdataFromBase64String = [[NSData alloc] initWithBase64EncodedString:[url query] options:0];  // base64解密
         // Decoded NSString from the NSData
-////        NSString *base64Decoded = [[NSString alloc]
-//                                    initWithData:nsdataFromBase64String encoding:NSUTF8StringEncoding];
+//        NSLog(@"data string is:%@",nsdataFromBase64String);
+//        NSString *base64Decoded = [[NSString alloc] initWithData:nsdataFromBase64String
+//                                                        encoding:NSUTF8StringEncoding];
+//        NSLog(@"decoded data is :%@ count:%d",base64Decoded,base64Decoded.length);
+        if (!nsdataFromBase64String) { // 如果为空则直接返回
+            NSLog(@"nil just return");
+            return YES;
+        }
         dicQuery = [NSJSONSerialization JSONObjectWithData:nsdataFromBase64String options:NSJSONReadingMutableLeaves error:nil];
+        if (![dicQuery.allKeys containsObject:@"userName"]) { // 如果传过来的值不包含账号信息 也直接返回
+            NSLog(@"not contain username");
+            return YES;
+        }
         NSString *userName = [dicQuery valueForKey:@"userName"];
         NSLog(@"haha dicuqey:%@\nusernameis:%@",dicQuery,userName);
         
-
         // 每次启动之前把 属性读出来 如果需要登陆 则在登陆 函数里面再次读取
         studentAccount = [StudentAccount sharedStudentAccount];
         accountManager = [AccountManager sharedAccountManager];
@@ -98,11 +107,6 @@
         NSArray *allKeys = [userInfo allKeys];
         if ([allKeys containsObject:roleName]) accountManager.role = [userInfo valueForKey:roleName];
         NSLog(@"userinfo role:%@",[userInfo valueForKey:roleName]);
-//        studentAccount.stuID = accountManager.userID;
-//        studentAccount.userID = accountManager.userID;
-//        studentAccount.role = accountManager.role;
-//        adminAccount.userID = accountManager.userID;
-//        adminAccount.role = accountManager.role;
 //        // 直接跳转
         // 页面跳转
         if (accountManager.role.integerValue==1||accountManager.role.integerValue==2) {// 学生
@@ -137,7 +141,6 @@
 
         
         [[IQKeyboardManager sharedManager] setKeyboardDistanceFromTextField:80]; // 距离，是否能调到中间位置
-        sleep(1);  //
         
     }
     return YES;

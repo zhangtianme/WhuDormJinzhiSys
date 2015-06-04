@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>6B0EB1E5-F532-4FA2-B2D8-03B294A9AB8D</string>
 	<key>IDESourceControlProjectName</key>
-	<string>WhuDormJinzhiSys</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>EBF34FF47C9D62B92D91B3DC91FD540A55B4A5BB</key>
 		<string>https://github.com/guichuqing/WhuDormJinzhiSys.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>WhuDormJinzhiSys.xcodeproj</string>
+	<string>WhuDormJinzhiSys.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>EBF34FF47C9D62B92D91B3DC91FD540A55B4A5BB</key>

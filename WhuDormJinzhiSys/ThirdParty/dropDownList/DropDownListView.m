@@ -345,5 +345,23 @@
     // Drawing code
 }
 */
+//-(void)sectionBtnTouch:(UIButton *)btn
+//{
+//    NSInteger section = btn.tag - SECTION_BTN_TAG_BEGIN;
+#pragma mark - self added
+-(void)backGroundTappedAction {
+    UIImageView *currentIV = (UIImageView *)[self viewWithTag:(SECTION_IV_TAG_BEGIN + currentExtendSection)];
+    [UIView animateWithDuration:0.001 animations:^{
+        currentIV.transform = CGAffineTransformRotate(currentIV.transform, DEGREES_TO_RADIANS(180));
+    }];
+    [self hideExtendedChooseView];
+}
+
+//- (void)chooseSection:(NSInteger)section {  // 模拟点击
+//    NSInteger btnTag = section +SECTION_BTN_TAG_BEGIN;
+//    UIButton *btn = (UIButton *)[self viewWithTag:btnTag];
+//    [self sectionBtnTouch:btn];
+////    [self]
+//}
 
 @end

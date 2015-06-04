@@ -112,6 +112,7 @@
     // Register cell classes
     //    [logTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:reuseIdentifier];
     hisDataTableView.backgroundColor = lightBlueColor; // 淡蓝色背景色
+    hisDataTableView.tableFooterView = [[UIView alloc] init]; // 去除多余空白行
     [self.view addSubview:hisDataTableView];
     
 }

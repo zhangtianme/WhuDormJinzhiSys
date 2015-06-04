@@ -27,6 +27,9 @@
 
 //#import "UILabel+VerticalAlign.h"
 
+#define isDemoVersion  0       // 是否demo版本
+
+
 #define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 #define UIColorFromRGBAlpha(rgbValue,alphaa) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:alphaa]
 
@@ -64,9 +67,11 @@
 
 #define airConName              @"空调"
 #define lightingName            @"照明"
+#define hotWaterName            @"热水"
 
 #define dormName                @"宿舍"
 #define studentName             @"学生"
+#define threePhaseName          @"综合"
 #define floorName               @"Floor"
 
 
@@ -169,8 +174,8 @@
 #define operateName     @"用电操作"        // 用来辨别type里面的操作归属问题
 
 //  queryHisdata 各参数的名字
-#define elecValueName   @"EletricityValue"// 间隔时间的电量
-#define valueName       @"Value"          // 历史数据的值
+#define elecValueName       @"EletricityValue"// 间隔时间的电量
+#define valueName           @"Value"          // 历史数据的值
 
 //  queryBuildingDetail 各参数的名字
 #define lightningStatusName @"zmStatus"       // 照明的异常状态
@@ -178,7 +183,16 @@
 #define airConStatusName    @"ktStatus"       // 空调的异常状态
 #define airConStateName     @"ktState"        // 空调的开关状态
 
-
+//  queryThreephase_R 各参数的名字
+#define activePowerName     @"ActivePower"    // 三相电表的有功功率
+#define reactivePowerName   @"ReactivePower"  // 三相电表的无功功率
+#define currentAName        @"IA"             // A相电流
+#define currentBName        @"IB"             // B相电流
+#define currentCName        @"IC"             // C相电流
+#define voltageAName        @"VolA"           // A相电压
+#define voltageBName        @"VolB"           // B相电压
+#define voltageCName        @"VolC"           // C相电压
+#define electricityThreePhaseName   @"Electricity"   // 总电量
 
 
 

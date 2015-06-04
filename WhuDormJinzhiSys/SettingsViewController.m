@@ -11,8 +11,8 @@
 #define modifyPhoneSection    1// 修改手机号所在行
 #define modifyPasswordSection 2// 修改密码所在行
 #define aboutSection          3// 关于所在行
-#define versionUpdateSection  4// 版本更新所在行
-#define logoutSection         5// 退出登陆所在行
+#define logoutSection         4// 退出登陆所在行
+#define versionUpdateSection  5// 版本更新所在行
 
 @interface SettingsViewController () {
     AccountManager *accountManager;
@@ -34,6 +34,15 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:versionUpdateSection]] setHidden:YES];
+
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
 }
 
 - (void)didReceiveMemoryWarning {

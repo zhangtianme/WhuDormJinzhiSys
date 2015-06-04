@@ -26,11 +26,12 @@
     NSString *name = [infoDictionary objectForKey:@"CFBundleDisplayName"];
     NSString *version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
     NSString *build = [infoDictionary objectForKey:@"CFBundleVersion"];
-
-     double doubleversion = version.doubleValue;
-    NSLog(@"veision:%@ build:%@ name:%@ doubleversion:%f",version,build,name,doubleversion);
-    _nameLabel.text = [NSString stringWithFormat:@"武大宿舍用电V%@(%@)",version,build];
     
+    double doubleversion = version.doubleValue;
+    NSLog(@"veision:%@ build:%@ name:%@ doubleversion:%f",version,build,name,doubleversion);
+//    _nameLabel.text = [NSString stringWithFormat:@"武大宿舍用电V%@(%@)",version,build]; 不加build显示
+    _nameLabel.text = [NSString stringWithFormat:@"武大宿舍用电V%@",version];
+
 }
 
 - (void)didReceiveMemoryWarning {

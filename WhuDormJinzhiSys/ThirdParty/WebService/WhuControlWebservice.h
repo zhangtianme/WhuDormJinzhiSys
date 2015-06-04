@@ -52,9 +52,15 @@
 + (NSString *)modifyPasswordWithUserID:(NSString *)userID oldPassword:(NSString *)oldPassword modifyPassword:(NSString *)modifyPassword role:(NSString *)role;
 // 插入控制命令 01 返回0/1
 + (NSString *)insertOrderWithUserID:(NSString *)userID roomID:(NSString *)roomID accountType:(NSString *)accountType orderID:(NSString *)orderID;
-
 // 检查版本 iOS 返回dictionary
 + (NSDictionary *)queryVersionWithType:(NSString *)type;
+
+// 查询某栋宿舍的三相电表的当前状态
++ (NSDictionary *)queryCurrentThreePhaseStateWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit accountType:(NSString *)accountType;
+// 查询某栋宿舍的三相电表的历史状态
++ (NSArray *)queryHisThreePhaseStateWithArea:(NSString *)area building:(NSString *)building unit:(NSString *)unit accountType:(NSString *)accountType field:(NSString *)field startTime:(NSString *)startTime endTime:(NSString *)endTime freq:(NSString *)freq;
+
+
 
 /*Inquiry_BillMonth_RoomID
  <?xml version="1.0" encoding="utf-8"?>

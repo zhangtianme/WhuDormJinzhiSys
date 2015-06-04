@@ -55,9 +55,10 @@
  */
 - (void)layoutSubviews {
     [super layoutSubviews];
-    NSLog(@"loyout subviews;");
+//    NSLog(@"loyout subviews;");
     [self setup];
 }
+
 //- (void)setFrame:(CGRect)frame {
 ////        NSLog(@"set frame frame:%@",NSStringFromCGRect(frame));
 //    [super setFrame:frame];
@@ -134,6 +135,9 @@
         _lightningStateSwitch.onTintColor = mainBlueColor;
         [self addSubview:_lightningStateSwitch];
     }
+    if (isDemoVersion) { // 是demo版本
+        [_lightningStateSwitch setUserInteractionEnabled:NO];// demo版本 不能点击
+    }
     [_lightningStateSwitch setFrame:lightStateSwitchFrame];
 
     
@@ -143,6 +147,7 @@
         _airConStateSwitch.onTintColor = mainBlueColor;
         [self addSubview:_airConStateSwitch];
     }
+    [_airConStateSwitch setUserInteractionEnabled:NO];// demo版本 不能点击
     [_airConStateSwitch setFrame:airConStateSwitchFrame];
 
 }

@@ -11,9 +11,14 @@
 
 #define roomTableViewHeaderHeight   20
 #define studentTableViewHeaderHeight   20
+#define threePhaseTableViewHeaderHeight   20
+
+#define tpTableViewSections       2 // 三相电表tableview的分区数
+#define tpTableViewSection0Rows   3 // 三相电表tableview的分区0的行数
+#define tpTableViewSection1Rows   8 // 三相电表tableview的分区1的行数
+
 #define searchTableViewHeaderHeight   20
 //#define headerLabelTagBegin          101     // header 里面的label的tag
-
 
 #define allFloorName    @"全部楼层"
 @interface AllDormInfoViewController () {
@@ -26,21 +31,23 @@
     NSMutableArray   *dropDownDataArr; // 下拉菜单的数组 4个nsarray组成 area/building/unit/floor
     NSMutableArray   *managedUnits;    // 可以管理的楼栋
     
-    NSMutableArray   *allRooms;        // 所有的房间
-    NSMutableArray   *displayRooms;    // 显示的房间
-    NSArray          *searchedRooms;    // 搜索到的房间
-    NSArray          *hisSearchedRooms; // 历史搜索过的房间
-    
-    NSMutableArray   *roomFloors;      // 楼层 用来分区
+    NSMutableArray *allRooms;             // 所有的房间
+    NSMutableArray *displayRooms;         // 显示的房间
+    NSArray        *searchedRooms;        // 搜索到的房间
+    NSArray        *hisSearchedRooms;     // 历史搜索过的房间
 
+    NSMutableArray *roomFloors;           // 楼层 用来分区
 
-    NSArray          *allStudents;     // 所有学生
-    NSMutableArray   *displayStudents; // 显示的学生
-    NSArray          *allSearchRooms;  // 搜索用的全部房间
-    NSArray          *searchedStudents; // 搜索到的学生
-    NSArray          *hisSearchedStudents; // 历史搜索过的学生
+    NSArray        *allStudents;          // 所有学生
+    NSMutableArray *displayStudents;      // 显示的学生
+    NSArray        *allSearchRooms;       // 搜索用的全部房间
+    NSArray        *searchedStudents;     // 搜索到的学生
+    NSArray        *hisSearchedStudents;  // 历史搜索过的学生
 
-    NSMutableArray   *studentRoomNums; // 房间号 用来分区
+    NSMutableArray *allThreePhaseInfos;    // 所有的三相电表数据
+    NSDictionary   *displayThreePhaseinfo; // 当前要显示的三相电表数据
+
+    NSMutableArray *studentRoomNums;      // 房间号 用来分区
 
     NSMutableString  *selectedArea;    // 当前选择的学部
     NSMutableString  *selectedBuilding;// 当前选择的楼栋
@@ -52,6 +59,9 @@
 @property (nonatomic, strong) UISegmentedControl        *segmentedControl;// 选择控制
 @property (nonatomic, strong) UITableView               *roomTableView;// 宿舍分页
 @property (nonatomic, strong) UITableView               *studentTableView;// 学生分页
+@property (nonatomic, strong) UITableView               *threePhaseTableView;// 三相电表分页
+
+@property (nonatomic, strong) NSArray                   *threePhaseAccountType;// 三相电表查询的类型
 
 @property (nonatomic, strong) UISearchBar               *searchBar;// 搜索栏
 @property (nonatomic, strong) UISearchDisplayController *searchDC;// 展示控制器
@@ -61,7 +71,7 @@
 
 @implementation AllDormInfoViewController
 
-
+#pragma mark - Life Cycle
 - (void)viewDidLoad {
     
     [super viewDidLoad];
@@ -79,8 +89,8 @@
     }
     
     // 导航条添加 segment control
-    self.segmentedControl = [[UISegmentedControl alloc] initWithItems:@[dormName, studentName]];
-    [self.segmentedControl setFrame:CGRectMake(96, 7, 128, 30)];  //
+    self.segmentedControl = [[UISegmentedControl alloc] initWithItems:@[dormName, studentName,threePhaseName]];
+    [self.segmentedControl setFrame:CGRectMake(0, 0, 180, 30)];  //
 
     [self.segmentedControl setSelectedSegmentIndex:0]; // 选择第一项
     [self.navigationItem setTitleView:self.segmentedControl];
@@ -111,7 +121,7 @@
     self.scrollView.backgroundColor = lightBlueColor;// 淡蓝色背景
     self.scrollView.pagingEnabled = YES;
     self.scrollView.showsHorizontalScrollIndicator = NO;
-    self.scrollView.contentSize = CGSizeMake(2*viewWidth, viewHeight);
+    self.scrollView.contentSize = CGSizeMake(3*viewWidth, viewHeight);
     self.scrollView.delegate = self;
     self.scrollView.userInteractionEnabled = YES;
     [self.scrollView scrollRectToVisible:CGRectMake(0, 0, viewWidth, viewHeight) animated:YES];
@@ -135,6 +145,15 @@
     _studentTableView.rowHeight = 44.0f;
     _studentTableView.sectionHeaderHeight = studentTableViewHeaderHeight;
     [_scrollView addSubview:_studentTableView];
+    // 三相电表
+    
+    _threePhaseTableView = [[UITableView alloc] initWithFrame:CGRectMake(2*viewWidth, 0, viewWidth, viewHeight) style:UITableViewStylePlain];
+    _threePhaseTableView.dataSource = self;
+    _threePhaseTableView.delegate = self;
+    _threePhaseTableView.backgroundColor = lightBlueColor;
+    _threePhaseTableView.rowHeight = 44.0f;
+    _threePhaseTableView.sectionHeaderHeight = threePhaseTableViewHeaderHeight;
+    [_scrollView addSubview:_threePhaseTableView];
 
     // 搜索框初始化
     _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 40)];
@@ -147,11 +166,6 @@
     _searchBar.delegate = self;
     _roomTableView.tableHeaderView = _searchBar;
     
-//    // 数据控制器初始化
-//    _resultsController = [[SearchResultsController alloc] init];
-//    [_resultsController willMoveToParentViewController:self];
-//    [self addChildViewController:_resultsController];
-//    [_resultsController didMoveToParentViewController:self];
     // displaycontroller 初始化
     _searchDC = [[UISearchDisplayController alloc] initWithSearchBar:_searchBar contentsController:self];
     _searchDC.delegate = self;
@@ -162,11 +176,11 @@
 //    [_scrollView addHeaderWithTarget:self action:@selector(headerRereshing)];
     [_roomTableView addHeaderWithTarget:self action:@selector(headerRereshing)];
     [_studentTableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+    [_threePhaseTableView addHeaderWithTarget:self action:@selector(headerRereshing)];
+
+    _threePhaseAccountType = @[lightingName,airConName,hotWaterName];
 }
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [dropDownView hideExtendedChooseView]; // 隐藏下拉菜单
@@ -186,6 +200,7 @@
     hisSearchedStudents = accountManager.studentSearchHis;
     [_searchDC.searchResultsTableView reloadData];
     NSLog(@"viewwillappear");
+    
 }
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -193,16 +208,15 @@
 
 - (void)headerRereshing
 {
-    [self queryDataAndShowHud]; // 手动刷新无条件请求数据
+    [self queryDataAndShowHud]; // 刷新请求数据
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         // 刷新表格
         // (最好在刷新表格后调用)调用endRefreshing可以结束刷新状态
         [_roomTableView headerEndRefreshing];
         [_studentTableView headerEndRefreshing];
-
+        [_threePhaseTableView headerEndRefreshing];
     });
 }
-
 /**
  *  第一次请求数据
  */
@@ -281,20 +295,39 @@
         selectedBuilding = [firstUnit valueForKey:buildingName];
         selectedUnit = [firstUnit valueForKey:unitName];
     }
-
     // 计算出区域数组
     NSMutableArray *areas = [[NSMutableArray alloc]  initWithCapacity:10];
     for (NSDictionary *aUnit in managedUnits) {
         [areas addObject:[aUnit valueForKey:areaName]];
     }
-
     areas = (NSMutableArray *)[[NSSet setWithArray:areas] allObjects];
     dropDownDataArr[0] = areas;
     // 请求第一次数据
     allRooms =[NSMutableArray arrayWithArray:[WhuControlWebservice queryBuildingDetailWithArea:selectedArea building:selectedBuilding unit:selectedUnit]];
-
+    
     [NSObject cancelPreviousPerformRequestsWithTarget:self]; // 取消前面的定时函数
     [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
+//    // 请求三相电表的当前状态
+//    NSMutableDictionary *tempThreePhaseInfo = (NSMutableDictionary *)[WhuControlWebservice queryCurrentThreePhaseStateWithArea:selectedArea building:selectedBuilding unit:selectedUnit accountType:lightingName];
+//    [tempThreePhaseInfo setValue:selectedArea forKey:areaName];
+//    [tempThreePhaseInfo setValue:selectedBuilding forKey:buildingName];
+//    [tempThreePhaseInfo setValue:selectedUnit forKey:unitName];
+//    [tempThreePhaseInfo setValue:lightingName forKey:accountTypeName];
+//    allThreePhaseInfos = [NSMutableArray arrayWithObject:tempThreePhaseInfo];
+    // 请求三相电表的当前状态
+    allThreePhaseInfos = [[NSMutableArray alloc] init]; // 先清空
+    for (NSString *accountType in _threePhaseAccountType) {
+        NSMutableDictionary *tempThreePhaseInfo = (NSMutableDictionary *)[WhuControlWebservice queryCurrentThreePhaseStateWithArea:selectedArea building:selectedBuilding unit:selectedUnit accountType:accountType];
+        [tempThreePhaseInfo setValue:selectedArea forKey:areaName];
+        [tempThreePhaseInfo setValue:selectedBuilding forKey:buildingName];
+        [tempThreePhaseInfo setValue:selectedUnit forKey:unitName];
+        [tempThreePhaseInfo setValue:accountType forKey:accountTypeName];
+        if (tempThreePhaseInfo) { // not nil
+            [allThreePhaseInfos addObject:tempThreePhaseInfo];
+        }
+        NSLog(@"tempThreePhaseInfo is :%@",tempThreePhaseInfo);
+    }
+    
 }
 - (void)updateInterface {
     // 根据选择的area/building/unit/floor 更新数据
@@ -310,7 +343,6 @@
                 }
             }
         }
-        
         // 楼层索引去重
         roomFloors = [NSMutableArray arrayWithArray:[[NSSet setWithArray:roomFloors] allObjects]];
         // 排序
@@ -327,10 +359,9 @@
             [tempDisplayRooms addObject:predicatedArr];
         }
         displayRooms = [NSMutableArray arrayWithArray:tempDisplayRooms];
-//        NSLog(@"displayroomscount:%lu selectedarea:%@ build:%@ unit:%@ floor：%@",(unsigned long)displayRooms.count,selectedArea,selectedBuilding,selectedUnit,selectedFloor);
         [_roomTableView reloadData];
-
-    } else {
+    } else if (_segmentedControl.selectedSegmentIndex == 1) {// 学生
+        NSLog(@"updateinterface index:%ld",(long)_segmentedControl.selectedSegmentIndex);
         // 计算出要显示的人员信息
         displayStudents = [[NSMutableArray alloc] initWithCapacity:10];
         studentRoomNums = [[NSMutableArray alloc] initWithCapacity:10];
@@ -360,21 +391,21 @@
         displayStudents = [NSMutableArray arrayWithArray:tempDisplayStudents];
 //        NSLog(@"displaystudentscount:%lu selectedarea:%@ build:%@ unit:%@ floor：%@",(unsigned long)displayStudents.count,selectedArea,selectedBuilding,selectedUnit,selectedFloor);
         [_studentTableView reloadData];
+    } else if (_segmentedControl.selectedSegmentIndex == 2) {// 三相电表
+        NSArray *predicatedArr = [allThreePhaseInfos filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"Area == %@ AND Building == %@ AND Unit == %@ AND AccountType == %@",selectedArea,selectedBuilding,selectedUnit,selectedFloor]]; //筛选指定的元素
+        displayThreePhaseinfo = [predicatedArr firstObject];
+        NSLog(@"displayThreePhaseinfo is:%@",displayThreePhaseinfo);
+        [_threePhaseTableView reloadData];
     }
-    
-    NSLog(@"updated interface");
-    if (_segmentedControl.selectedSegmentIndex == 0) {// 宿舍
-    } else if (_segmentedControl.selectedSegmentIndex == 1) {// 学生
-    }
+    NSLog(@"updated interface");
 }
 /**
  *  后续请求数据
  */
 - (void)querySelectedDataAndShowHud {
-    NSLog(@"go on query data");
     // 判断是否已经请求过数据 如果没有请求则再次请求并且合并数据
     for (NSDictionary *aRoom in allRooms) {
-        if ([selectedArea isEqualToString:[aRoom valueForKey:areaName]]&&[selectedBuilding isEqualToString:[aRoom valueForKey:buildingName]]&&[selectedUnit isEqualToString:[aRoom valueForKey:unitName]]) {
+        if ([selectedArea isEqualToString:[aRoom valueForKey:areaName]]&&[selectedBuilding isEqualToString:[aRoom valueForKey:buildingName]]&&[selectedUnit isEqualToString:[aRoom valueForKey:unitName]]) { // 如果已经存在数据则从请求的数据在中获得楼层信息并返回
             // 计算出楼层数组 继续跳转到dropdownmenu上面
             NSMutableArray *floors = [[NSMutableArray alloc]  initWithCapacity:10];
             for (NSDictionary *aRoom in allRooms) {
@@ -386,13 +417,16 @@
             if (floors.count) { // not nil
                 [floors insertObject:@"全部楼层" atIndex:0];
             }
-            dropDownDataArr[3] = floors;
+            if (_segmentedControl.selectedSegmentIndex ==0) { // 选择的是宿舍这一项则查询数据
+                dropDownDataArr[3] = floors;
+            } else if (_segmentedControl.selectedSegmentIndex ==2) { // 选择的是三相电表
+                dropDownDataArr[3] = _threePhaseAccountType;
+            }
+
             [self chooseAtSection:2 index:0]; // 选择了楼栋之后选择第一行楼层 即全部楼层
             return;
-
         }
     }
-    
     [mbHud showWithTitle:@"数据加载中..." detail:nil];
     [self performSelector:@selector(requestTimeout:) withObject:nil afterDelay:timeoutRequest];// 5秒的超时
     // 异步线程调用接口
@@ -415,7 +449,11 @@
             if (floors.count) { // not nil
                 [floors insertObject:@"全部楼层" atIndex:0];
             }
-            dropDownDataArr[3] = floors;
+            if (_segmentedControl.selectedSegmentIndex ==0) { // 选择的是宿舍这一项则查询数据
+                dropDownDataArr[3] = floors;
+            } else if (_segmentedControl.selectedSegmentIndex ==2) { // 选择的是三相电表
+                dropDownDataArr[3] = _threePhaseAccountType;
+            }
             [self chooseAtSection:2 index:0]; // 选择了楼栋之后选择第一行楼层 即全部楼层
         });
     });
@@ -424,18 +462,24 @@
  *  根据当前选择的单元楼栋等请求数据
  */
 - (void)querySelectedData {
-    // 判断是否已经请求过数据 如果没有请求则再次请求并且合并数据
-//    for (NSDictionary *aRoom in allRooms) {
-//        if ([selectedArea isEqualToString:[aRoom valueForKey:areaName]]&&[selectedBuilding isEqualToString:[aRoom valueForKey:buildingName]]&&[selectedUnit isEqualToString:[aRoom valueForKey:unitName]]) {
-//            return;
-//        }
-//    }
-    
-
     NSArray *tempRooms = [WhuControlWebservice queryBuildingDetailWithArea:selectedArea building:selectedBuilding unit:selectedUnit];
     [allRooms addObjectsFromArray:tempRooms];
+    
+    // 请求三相电表的当前状态
+    for (NSString *accountType in _threePhaseAccountType) {
+        NSMutableDictionary *tempThreePhaseInfo = (NSMutableDictionary *)[WhuControlWebservice queryCurrentThreePhaseStateWithArea:selectedArea building:selectedBuilding unit:selectedUnit accountType:accountType];
+        [tempThreePhaseInfo setValue:selectedArea forKey:areaName];
+        [tempThreePhaseInfo setValue:selectedBuilding forKey:buildingName];
+        [tempThreePhaseInfo setValue:selectedUnit forKey:unitName];
+        [tempThreePhaseInfo setValue:accountType forKey:accountTypeName];
+        if (tempThreePhaseInfo) { // not nil
+            [allThreePhaseInfos addObject:tempThreePhaseInfo];
+        }
+
+    }
     NSLog(@"allroomscounts:%lu",(unsigned long)allRooms.count);
 }
+
 
 // 根据权限 获取可以管理的楼栋
 - (NSArray *)managedUnitsFromAllUnit:(NSArray *)allUnits Area:(NSString *)area building:(NSString *)building unit:(NSString *)unit {
@@ -474,6 +518,7 @@
 
     return tempManagedUnits;
 }
+
 #pragma mark - Table view delegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([tableView isEqual:_roomTableView]) { // 宿舍视图
@@ -492,12 +537,14 @@
             [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleCancel handler:nil]];
             [self presentViewController:alertController animated:YES completion:nil];
         }
-    } else if ([tableView isEqual:_studentTableView]) { // 学生视图
+    }
+    else if ([tableView isEqual:_studentTableView]) { // 学生视图
         NSDictionary *aStudent = displayStudents[indexPath.section][indexPath.row];
         StudentViewController *studentViewController = [self.storyboard instantiateViewControllerWithIdentifier:studentInfoIdentity];
         studentAccount.stuID  = [aStudent valueForKey:stuIDName];
         [self.navigationController pushViewController:studentViewController animated:YES];
-    } else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
+    }
+    else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
         if (_searchDC.searchBar.text.length == 0) { // 加载默认数据
             switch (indexPath.section) {
                 case 0:{ // 搜索到的宿舍
@@ -565,31 +612,42 @@
         }
         NSLog(@"select search tableview");
     }
+    else if ([tableView isEqual:_threePhaseTableView]) {
+        
+    }
+    
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     CGFloat heightForRow = 60;
     if ([tableView isEqual:_roomTableView]) { // 宿舍视图
         heightForRow = 60;
     } else if ([tableView isEqual:_studentTableView]) { // 学生视图
         heightForRow = 44;
+    } else if ([tableView isEqual:_threePhaseTableView]) { // 三相电表视图
+        heightForRow = 44;
     } else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
         heightForRow = 44;
     }
     return heightForRow;
 }
+
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     CGFloat heightForSection = 60;
     if ([tableView isEqual:_roomTableView]) { // 宿舍视图
         heightForSection = roomTableViewHeaderHeight;
     } else if ([tableView isEqual:_studentTableView]) { // 学生视图
         heightForSection = studentTableViewHeaderHeight;
+    } else if ([tableView isEqual:_threePhaseTableView]) { // 三相电表视图
+        heightForSection = threePhaseTableViewHeaderHeight;
     } else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
         heightForSection = searchTableViewHeaderHeight;
     }
     
     return heightForSection;
 }
+
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if ([tableView isEqual:_roomTableView]) { // 宿舍视图
         static NSString *roomHeaderIdentifier = @"roomHeaderView";
@@ -605,9 +663,18 @@
         if(!studentHeader) {
             studentHeader = [[RoomHeader alloc] initWithReuseIdentifier:studentHeaderIdentifier];
         }
-        studentHeader.detailLabel.text = [NSString stringWithFormat:@"%@-%@-%@-%@房间",selectedArea,selectedBuilding,selectedUnit,studentRoomNums[section]];
+        studentHeader.detailLabel.text = [NSString stringWithFormat:@"%@-%@%@-%@房间",selectedArea,selectedBuilding,selectedUnit,studentRoomNums[section]];
         return studentHeader;
+    } else if ([tableView isEqual:_threePhaseTableView]) { // 三相电表视图
+        static NSString *threePhaseHeaderIdentifier = @"threePhaseHeaderView";
+        RoomHeader *threePhasetHeader = [tableView dequeueReusableHeaderFooterViewWithIdentifier:threePhaseHeaderIdentifier];
+        if(!threePhasetHeader) {
+            threePhasetHeader = [[RoomHeader alloc] initWithReuseIdentifier:threePhaseHeaderIdentifier];
+        }
+//        threePhasetHeader.detailLabel.text = [NSString stringWithFormat:@"%@-%@-%@-%@房间",selectedArea,selectedBuilding,selectedUnit,studentRoomNums[section]];
+        return threePhasetHeader;
     } else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
+        NSLog(@"text is :%@",_searchDC.searchBar.text);
         if (_searchDC.searchBar.text.length == 0) { // 加载默认数据
             static NSString *searchDefaultHeaderIdentifier = @"searchDefaultHeaderView";
             RoomHeader *searchDefaultHeader = [tableView dequeueReusableHeaderFooterViewWithIdentifier:searchDefaultHeaderIdentifier];
@@ -639,6 +706,7 @@
     UIView *myHeader;
     return myHeader;
 }
+
 #pragma mark - Table View Data Source
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // Return the number of sections.
@@ -647,6 +715,8 @@
         sectionNumber = displayRooms.count;
     } else if ([tableView isEqual:_studentTableView]) { // 学生视图
         sectionNumber = displayStudents.count;
+    } else if ([tableView isEqual:_threePhaseTableView]) { // 三相电表视图
+        sectionNumber = tpTableViewSections; // 分俩个区
     } else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
         if (_searchDC.searchBar.text.length == 0) { // 加载默认数据
             sectionNumber = 2;
@@ -661,8 +731,14 @@
     // Return the number of rows in the section.
     if ([tableView isEqual:_roomTableView]) { // 宿舍视图
         numberInsection = [displayRooms[section] count];
-    } else if ([tableView isEqual:_studentTableView]) {
+    } else if ([tableView isEqual:_studentTableView]) { // 学生视图
         numberInsection = [displayStudents[section] count];
+    } else if ([tableView isEqual:_threePhaseTableView]) { // 三相电表视图
+        switch (section) {
+            case 0: numberInsection = tpTableViewSection0Rows; break;
+            case 1: numberInsection = tpTableViewSection1Rows; break;
+            default: break;
+        }
     } else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
         if (_searchDC.searchBar.text.length == 0) { // 加载默认数据
             switch (section) {
@@ -701,6 +777,15 @@
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }
 
+        [self tableView:tableView configureCell:cell atIndexPath:indexPath];
+        return cell;
+    } else if ([tableView isEqual:_threePhaseTableView]) { // 三相电表视图
+        static NSString *threePhaseCellIdentifier = @"ThreePhaseCell";
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:threePhaseCellIdentifier];
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier: threePhaseCellIdentifier];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        }
         [self tableView:tableView configureCell:cell atIndexPath:indexPath];
         return cell;
     } else if ([tableView isEqual:_searchDC.searchResultsTableView]) { // 搜索视图
@@ -744,11 +829,81 @@
         roomCell.airConStateSwitch.on = [[aRoom valueForKey:airConStateName] boolValue];
         [roomCell.lightningStateSwitch addTarget:self action:@selector(didClickLightningSwitch:) forControlEvents:UIControlEventValueChanged];
         [roomCell.airConStateSwitch addTarget:self action:@selector(didClickAirConSwitch:) forControlEvents:UIControlEventValueChanged];
+        
     } else if ([tableView isEqual:_studentTableView]) { // 学生视图
         NSDictionary *aStudent = displayStudents[indexPath.section][indexPath.row];
         cell.imageView.image = [UIImage imageNamed:@"manPhotoIcon"];
         cell.textLabel.text = [aStudent valueForKey:stuNameName];
         cell.detailTextLabel.text = [aStudent valueForKey:facultyName];
+    } else if ([tableView isEqual:_threePhaseTableView]) { // 三相电表视图
+        NSDictionary *threePhaseInfo = displayThreePhaseinfo;
+        switch (indexPath.section) {
+            case 0: {// 三相电表的用电量分区
+                cell.imageView.image = [UIImage imageNamed:@"elecIcon"];
+                switch (indexPath.row) {
+                    case 0: { // 本日用电量
+                        cell.textLabel.text = @"本日用电量";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@度",[threePhaseInfo valueForKey:elecDayName]];
+                    }break;
+                    case 1: { // 本月用电量
+                        cell.textLabel.text = @"本月用电量";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@度",[threePhaseInfo valueForKey:elecMonName]];
+                    }break;
+                    case 2: { // 总用电量
+                        cell.textLabel.text = @"总用电量";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@度",[threePhaseInfo valueForKey:electricityThreePhaseName]];
+                    }break;
+                    default: break;
+                }
+            }break;
+            case 1: {// 三相电表的电压电流功率分区
+                switch (indexPath.row) {
+                    case 0: { // 有功功率kW
+                        cell.imageView.image = [UIImage imageNamed:@"powerIcon"];
+                        cell.textLabel.text = @"有功功率";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@kW",[threePhaseInfo valueForKey:activePowerName]];
+                    }break;
+                    case 1: { // 无功功率kW
+                        cell.imageView.image = [UIImage imageNamed:@"powerIcon"];
+                        cell.textLabel.text = @"无功功率";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@kW",[threePhaseInfo valueForKey:reactivePowerName]];
+                    }break;
+                    case 2: { // A相电压
+                        cell.imageView.image = [UIImage imageNamed:@"voltageIcon"];
+                        cell.textLabel.text = @"A相电压";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@V",[threePhaseInfo valueForKey:voltageAName]];
+                    }break;
+                    case 3: { // A相电流
+                        cell.imageView.image = [UIImage imageNamed:@"currentIcon"];
+                        cell.textLabel.text = @"A相电流";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@A",[threePhaseInfo valueForKey:currentAName]];
+                    }break;
+                    case 4: { // B相电压
+                        cell.imageView.image = [UIImage imageNamed:@"voltageIcon"];
+                        cell.textLabel.text = @"B相电压";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@V",[threePhaseInfo valueForKey:voltageBName]];
+                    }break;
+                    case 5: { // B相电流
+                        cell.imageView.image = [UIImage imageNamed:@"currentIcon"];
+                        cell.textLabel.text = @"B相电流";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@A",[threePhaseInfo valueForKey:currentBName]];
+                    }break;
+                    case 6: { // C相电压
+                        cell.imageView.image = [UIImage imageNamed:@"voltageIcon"];
+                        cell.textLabel.text = @"C相电压";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@V",[threePhaseInfo valueForKey:voltageCName]];
+                    }break;
+                    case 7: { // C相电流
+                        cell.imageView.image = [UIImage imageNamed:@"currentIcon"];
+                        cell.textLabel.text = @"C相电流";
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%@A",[threePhaseInfo valueForKey:currentCName]];
+                    }break;
+                        
+                    default: break;
+                }
+            }break;
+            default: break;
+        }
     } else if ([tableView isEqual:_searchDC.searchResultsTableView]){ // 搜索视图
         if (_searchDC.searchBar.text.length == 0) { // 加载默认数据
             switch (indexPath.section) {
@@ -836,9 +991,10 @@
 #pragma mark -- dropDownListDelegate
 -(void)chooseAtSection:(NSInteger)section index:(NSInteger)index
 {
+    NSLog(@"choose at section:%d index:%d",section ,index);
     switch (section) {
         case 0: { // 学部
-            if ([dropDownDataArr[section] count]) {
+            if ([dropDownDataArr[section] count]) { // 存在数据才能继续进行
                 selectedArea = dropDownDataArr[section][index];
             }
             [dropDownView setTitle:selectedArea inSection:section];
@@ -852,11 +1008,11 @@
                     [units addObject:[aUnit valueForKey:unitName]];
                 }
             }
-            
             dropDownDataArr[1] = buildings;
             dropDownDataArr[2] = units;
             [self chooseAtSection:1 index:0]; // 选择了区域之后默认选择第一行的楼栋和单元
         }break;
+            
         case 1: { // building和unit
             if ([dropDownDataArr[section] count]) { // not nil
                 selectedBuilding = dropDownDataArr[1][index];
@@ -865,8 +1021,8 @@
             [dropDownView setTitle:[NSString stringWithFormat:@"%@%@",selectedBuilding,selectedUnit] inSection:section];
             // 请求数据
             if (_segmentedControl.selectedSegmentIndex ==0) { // 选择的是宿舍这一项则查询数据
-                [self querySelectedDataAndShowHud]; // 请求数据 请求完数据后要继续跳转到下面
-            } else {  // 选择的是学生
+                [self querySelectedDataAndShowHud]; // 请求数据 请求完数据后要继续跳转到下面 函数里面计算出楼层
+            } else if (_segmentedControl.selectedSegmentIndex ==1) {  // 选择的是学生
                 // 计算出楼层数组
                 NSMutableArray *floors = [[NSMutableArray alloc]  initWithCapacity:10];
                 for (NSDictionary *aStudent in allStudents) {
@@ -880,16 +1036,20 @@
                 }
                 dropDownDataArr[3] = floors;
                 [self chooseAtSection:2 index:0]; // 选择了楼栋之后选择第一行楼层 即全部楼层
+            } else if (_segmentedControl.selectedSegmentIndex ==2) {  // 选择的是三相电表
+                [self querySelectedDataAndShowHud]; // 请求数据 请求完数据后要继续跳转到下面 函数里面计算出楼层
+//
+//                dropDownDataArr[3] = _threePhaseAccountType;
+//                [self chooseAtSection:2 index:0]; // 选择了楼栋之后选择照明
             }
         }break;
         case 2: { // 楼层
-            NSLog(@"choose section:%dindex:%d",section,index);
+//            NSLog(@"choose section:%dindex:%d",section,index);
             if ([dropDownDataArr[section] count]) { // not nil
                 selectedFloor = dropDownDataArr[3][index];
             }
             [dropDownView setTitle:selectedFloor inSection:section];
             [self updateInterface];
-            
         }break;
         default:
             break;
@@ -973,7 +1133,6 @@
         [self.segmentedControl setSelectedSegmentIndex:page];
         [self scrollToSegmentIndex:page];
     }
-
 }
 - (void)segmentedControlChangedValue:(UISegmentedControl *)segmentedControl {
     //    NSLog(@"Selected index %ld (via UIControlEventValueChanged)", (long)segmentedControl.selectedSegmentIndex);
@@ -981,16 +1140,19 @@
 }
 - (void)scrollToSegmentIndex:(NSInteger)index {
     NSLog(@"scroll to index: %ld",(long)index);
-    [dropDownView hideExtendedChooseView]; // 隐藏下拉菜单
-    // 因为 有几层宿舍没人 所以宿舍和学生的数据 楼层部分有些不一样
-//    selectedBuilding = dropDownDataArr[1][index];
-//    selectedUnit = dropDownDataArr[2][index];
-    [self chooseAtSection:1 index:[[dropDownDataArr objectAtIndex:1] indexOfObject:selectedBuilding]];
-    ;
-//    [[dropDownDataArr objectAtIndex:2] indexOfObject:selectedUnit];
-//
-//    [self chooseAtSection:2 index:0];
+    [dropDownView backGroundTappedAction]; // 模拟点击背景 取消展开的视图
+
+    // 先做动画 再加载数据减少延迟
     [self.scrollView scrollRectToVisible:CGRectMake(index * self.view.frame.size.width, 0, self.view.frame.size.width, self.view.frame.size.height - 20 - 44) animated:YES];
+    // 切换视图时候找到 当前楼层的索引
+    NSInteger indexBuilding = 0;
+    for (int i =0; i<[dropDownDataArr[1] count]; i++) {
+        if ([dropDownDataArr[1][i] isEqualToString:selectedBuilding]&&[dropDownDataArr[2][i] isEqualToString:selectedUnit] ) {
+            indexBuilding = i;
+        }
+    }
+    [self chooseAtSection:1 index:indexBuilding];
+
 }
 
 #pragma mark - UISearchDisplayController delegate
@@ -1023,9 +1185,11 @@
 //    NSLog(@"searchedRooms:%@ \n searchedStudents:%@",searchedRooms,searchedStudents);
     return YES;
 }
+
 -(void)searchDisplayControllerWillBeginSearch:(UISearchDisplayController *)controller {
     NSLog(@"%s begin",__PRETTY_FUNCTION__);
 }
+
 -(void)searchDisplayControllerDidBeginSearch:(UISearchDisplayController *)controller {
     NSLog(@"%s begin",__PRETTY_FUNCTION__);
 //    // hack 方法 慎用
@@ -1040,6 +1204,8 @@
             }
         }
     }
+    controller.searchBar.text = @""; // 相当于初始化为空
+    [self searchDisplayController:controller shouldReloadTableForSearchString:controller.searchBar.text];// 加载
 //    // 2种方法一起
 //    for (UIView *subview in [[controller.searchResultsTableView superview] subviews]) {
 //        // This is somewhat hacky..
@@ -1051,23 +1217,11 @@
 
 }
 
-//-(void)searchDisplayControllerWillEndSearch:(UISearchDisplayController *)controller {
-//    NSLog(@"%s begin",__PRETTY_FUNCTION__);
-//}
-//-(void)searchDisplayController:(UISearchDisplayController *)controller didLoadSearchResultsTableView:(UITableView *)tableView {
-//    NSLog(@"%s begin",__PRETTY_FUNCTION__);
-//}
-//-(void)searchDisplayController:(UISearchDisplayController *)controller willUnloadSearchResultsTableView:(UITableView *)tableView {
-//    NSLog(@"%s begin",__PRETTY_FUNCTION__);
-//}
-//
-//-(void)searchDisplayController:(UISearchDisplayController *)controller didShowSearchResultsTableView:(UITableView *)tableView {
-//    NSLog(@"%s begin",__PRETTY_FUNCTION__);
-//}
 -(void)searchDisplayController:(UISearchDisplayController *)controller willHideSearchResultsTableView:(UITableView *)tableView {
     NSLog(@"%s begin",__PRETTY_FUNCTION__);
     //
 }
+
 -(void)searchDisplayController:(UISearchDisplayController *)controller didHideSearchResultsTableView:(UITableView *)tableView {
     NSLog(@"%s begin",__PRETTY_FUNCTION__);
 //    // hack 方法 慎用
@@ -1093,12 +1247,10 @@
 }
 
 #pragma mark - Navigation
-
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
 }
-
 
 @end

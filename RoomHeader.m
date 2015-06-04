@@ -54,6 +54,11 @@
     [self setup];
 }
 
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    [self setup];
+}
+
 - (void)setup {
     CGFloat width                     = self.contentView.frame.size.width;
     CGFloat height                    = self.contentView.frame.size.height;
@@ -69,7 +74,7 @@
         _detailLabel = [[UILabel alloc] init];
         _detailLabel.textAlignment = NSTextAlignmentLeft;
         _detailLabel.textColor = [UIColor blackColor];
-        _detailLabel.text = @"default";
+        _detailLabel.text = @"";
         [self addSubview:_detailLabel];
     }
     [_detailLabel setFrame:detailLabelFrame];

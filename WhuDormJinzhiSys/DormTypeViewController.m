@@ -35,7 +35,7 @@
     [super viewDidLoad];
     manager = [StudentAccount sharedStudentAccount];
     self.tableView.backgroundColor = lightBlueColor; // 淡蓝色
-    
+    self.tableView.rowHeight = 44;
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -164,7 +164,12 @@
         ((UILabel *)studentNames[i]).text = [manager.students[i] valueForKey:stuNameName];
         ((UILabel *)studentFacultys[i]).text = [manager.students[i] valueForKey:facultyName];
     }
-    [stateSwitch setEnabled:manager.controlLimit.boolValue]; // 是否具有控制权限
+    if (isDemoVersion) { // 是否demo版本
+        [stateSwitch setEnabled:NO]; // demo 版本没有控制权限
+    } else {
+        [stateSwitch setEnabled:manager.controlLimit.boolValue]; // 是否具有控制权限
+    }
+
 
     // 空调部分
     if ([accountType isEqualToString:airConName]) {
@@ -197,7 +202,6 @@
         currentLabel.text = [NSString stringWithFormat:@"%@A",manager.currentLight];
         powerRateLabel.text = [NSString stringWithFormat:@"%@",manager.powerRateLight];
     }
-
 }
 
 

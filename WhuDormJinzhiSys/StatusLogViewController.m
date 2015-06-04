@@ -177,6 +177,7 @@ static NSString * const reuseIdentifier = @"logCell";
     // Register cell classes
 //    [logTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:reuseIdentifier];
     logTableView.backgroundColor = lightBlueColor; // 淡蓝色背景色
+    logTableView.tableFooterView = [[UIView alloc] init]; // 去除多余空白行
     [self.view addSubview:logTableView];
     
     
